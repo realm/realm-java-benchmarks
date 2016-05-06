@@ -6,13 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.List;
 
 import io.realm.datastorebenchmark.Benchmark;
-import io.realm.datastorebenchmark.TestDataStore;
+import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.datastorebenchmark.greendao.DaoMaster;
 import io.realm.datastorebenchmark.greendao.DaoSession;
 import io.realm.datastorebenchmark.greendao.Employee;
 import io.realm.datastorebenchmark.greendao.EmployeeDao;
 
-public class TestGreenDAO extends TestDataStore {
+public class TestGreenDAO extends DataStoreTest {
 
 
     private long numberOfIterations;
@@ -291,5 +291,10 @@ public class TestGreenDAO extends TestDataStore {
     @Override
     public void testDelete() {
         // TODO Implement this test
+    }
+
+    @Override
+    protected String getTag() {
+        return "greendao";
     }
 }

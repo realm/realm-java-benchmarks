@@ -37,9 +37,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import io.realm.datastorebenchmark.Benchmark;
-import io.realm.datastorebenchmark.TestDataStore;
+import io.realm.datastorebenchmark.DataStoreTest;
 
-public class TestCouch extends TestDataStore {
+public class TestCouch extends DataStoreTest {
 
     private long numberOfIterations;
 
@@ -377,5 +377,10 @@ public class TestCouch extends TestDataStore {
     @Override
     public void testDelete() {
         // TODO Implement this test
+    }
+
+    @Override
+    protected String getTag() {
+        return "couchbase";
     }
 }

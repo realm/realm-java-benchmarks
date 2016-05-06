@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import io.realm.datastorebenchmark.Benchmark;
-import io.realm.datastorebenchmark.TestDataStore;
+import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.datastorebenchmark.ormlite.DataBaseHelper;
 import io.realm.datastorebenchmark.ormlite.Employee;
 
-public class TestOrmLite extends TestDataStore {
+public class TestOrmLite extends DataStoreTest {
 
     private long numberOfIterations;
     private DataBaseHelper dbHelper;
@@ -283,6 +283,11 @@ public class TestOrmLite extends TestDataStore {
     @Override
     public void testDelete() {
         // TODO Implement this test
+    }
+
+    @Override
+    protected String getTag() {
+        return "ormlite";
     }
 
     // Helper method for filling the DB

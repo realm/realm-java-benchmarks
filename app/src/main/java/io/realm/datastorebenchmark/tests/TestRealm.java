@@ -22,12 +22,12 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import io.realm.datastorebenchmark.Benchmark;
-import io.realm.datastorebenchmark.TestDataStore;
+import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.datastorebenchmark.realm.Author;
 import io.realm.datastorebenchmark.realm.Book;
 import io.realm.datastorebenchmark.realm.Employee;
 
-public class TestRealm extends TestDataStore {
+public class TestRealm extends DataStoreTest {
 
     private long numberOfIterations;
     private RealmConfiguration realmConfiguration;
@@ -322,5 +322,10 @@ public class TestRealm extends TestDataStore {
         measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
 
         tearDown();
+    }
+
+    @Override
+    protected String getTag() {
+        return "realm";
     }
 }

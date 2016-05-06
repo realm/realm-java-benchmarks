@@ -22,10 +22,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import io.realm.datastorebenchmark.Benchmark;
-import io.realm.datastorebenchmark.TestDataStore;
+import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.datastorebenchmark.entities.SQLiteDatabaseHelper;
 
-public class TestSQLite extends TestDataStore {
+public class TestSQLite extends DataStoreTest {
     protected SQLiteDatabase db;
     private SQLiteDatabaseHelper dbHelper;
     private long numberOfIterations;
@@ -354,5 +354,10 @@ public class TestSQLite extends TestDataStore {
         measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
 
         tearDown();
+    }
+
+    @Override
+    protected String getTag() {
+        return "sqlite";
     }
 }

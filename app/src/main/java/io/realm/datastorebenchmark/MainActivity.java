@@ -16,43 +16,93 @@
 
 package io.realm.datastorebenchmark;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
-import io.realm.datastorebenchmark.tests.TestCouch;
 import io.realm.datastorebenchmark.tests.TestGreenDAO;
 import io.realm.datastorebenchmark.tests.TestLowlevelRealm;
 import io.realm.datastorebenchmark.tests.TestOrmLite;
 import io.realm.datastorebenchmark.tests.TestRealm;
 import io.realm.datastorebenchmark.tests.TestSQLite;
-import io.realm.datastorebenchmark.tests.TestSugarOrm;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    final private long NUMBER_OF_ITERATIONS = 50;
-    final private long NUMBER_OF_OBJECTS = 1000;
+    // Benchmark configuration
+    public static final String OUTPUT_FOLDER = "datastorebenchmark";
+    private static final String TESTFILE_PREFIX = "datastore";
+    private static final long NUMBER_OF_ITERATIONS = 50;
+    private static final long NUMBER_OF_OBJECTS = 1000;
+
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        final TextView statusView = (TextView) findViewById(R.id.textView);
 
-        // does CPU timer work?
+        // Configure which tests to run
+        Context context = getApplicationContext();
+        final List<DataStoreTest> tests = Arrays.asList(
+            new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+            new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+            new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+            new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+            new TestGreenDAO(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+//            new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+//            new TestSugarOrm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
+        );
+
+        // Does our preferred timer work?
+        checkCpuTimeNanos();
+
+        // Create folder used to store benchmark results.
+        File outputFolder = createOutputDirectory();
+
+        // resolution/granularity of timer
+        measureTimerResolution(outputFolder);
+
+        // Run tests
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (DataStoreTest test : tests) {
+                    test.allTests();
+                    test.saveHeader(TESTFILE_PREFIX);
+                    test.saveMeasurements(TESTFILE_PREFIX);
+                }
+                statusView.setText("Done");
+            }
+        }, 800);
+    }
+
+    /**
+     * Verify that the timer mechanism is available.
+     */
+    private void checkCpuTimeNanos() {
         if (Debug.threadCpuTimeNanos() == -1) {
             throw new RuntimeException("Debug.threadCpuTimeNanos() doesn't work.");
         }
+    }
 
-        // create folder for output
-        File directory = new File(Environment.getExternalStorageDirectory() + "/datastorebenchmark");
-        directory.mkdirs();
-
-        // resolution/granularity of timer
+    /**
+     * Measure the resolution of the timer.
+     * Any measurements close to this value is unreliable.
+     */
+    private void measureTimerResolution(File outputFolder) {
         // see http://gamasutra.com/view/feature/171774/getting_high_precision_timing_on_.php?print=1
         long diff = 50000; // very large value
         for (int i = 0; i < 100; i++) {
@@ -69,49 +119,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         try {
-            File file = new File(Environment.getExternalStorageDirectory() + "/datastorebenchmark", "timer");
+            File file = new File(outputFolder, "timer");
             FileOutputStream fileOutputStream = new FileOutputStream(file, false);
-            fileOutputStream.write(String.format("%d\n", NUMBER_OF_ITERATIONS).getBytes());
-            fileOutputStream.write(String.format("%d\n", NUMBER_OF_OBJECTS).getBytes());
-            fileOutputStream.write(String.format("%d\n", diff).getBytes());
+            fileOutputStream.write(String.format(Locale.US, "%d\n", NUMBER_OF_ITERATIONS).getBytes());
+            fileOutputStream.write(String.format(Locale.US, "%d\n", NUMBER_OF_OBJECTS).getBytes());
+            fileOutputStream.write(String.format(Locale.US, "%d\n", diff).getBytes());
             fileOutputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
-        String FILE_PREFIX = "datastore";
-
-        TestRealm testRealm = new TestRealm(getApplicationContext(), NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
-        testRealm.allTests();
-        testRealm.saveHeader(FILE_PREFIX); // first one print header too
-        testRealm.saveMeasurements("realm", FILE_PREFIX);
-
-        TestSQLite testSQLite = new TestSQLite(getApplicationContext(), NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
-        testSQLite.allTests();
-        testSQLite.saveMeasurements("sqlite", FILE_PREFIX);
-
-        TestLowlevelRealm testLowlevelRealm = new TestLowlevelRealm(getApplicationContext(), NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
-        testLowlevelRealm.allTests();
-        testLowlevelRealm.saveMeasurements("realmlowlevel", FILE_PREFIX);
-
-        TestOrmLite testOrmLite = new TestOrmLite(getApplicationContext(), NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
-        testOrmLite.allTests();
-        testOrmLite.saveMeasurements("ormlite", FILE_PREFIX);
-
-        TestSugarOrm testSugarOrm = new TestSugarOrm(getApplicationContext(), NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
-        testSugarOrm.allTests();
-        testSugarOrm.saveMeasurements("sugarorm", FILE_PREFIX);
-
-        TestCouch testCouch = new TestCouch(getApplicationContext(), NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
-        testCouch.allTests();
-        testCouch.saveMeasurements("couchbase", FILE_PREFIX);
-
-        TestGreenDAO testGreenDAO = new TestGreenDAO(getApplicationContext(), NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
-        testGreenDAO.allTests();
-        testGreenDAO.saveMeasurements("greendao", FILE_PREFIX);
-
-        setContentView(R.layout.activity_main);
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText("Done");
+    /**
+     * Create the output directory that should hold all the test results. All previous results will be deleted.
+     *
+     * @return a reference to the created (and empty) directory.
+     */
+    private File createOutputDirectory() {
+        File directory = new File(Environment.getExternalStorageDirectory() + "/" + OUTPUT_FOLDER);
+        if (!directory.mkdirs() && !directory.exists()) {
+            throw new IllegalStateException("Could not create output folder: " + directory);
+        }
+        try {
+            FileUtils.cleanDirectory(directory);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not clear the output folder", e);
+        }
+        return directory;
     }
 }

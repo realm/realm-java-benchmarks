@@ -23,14 +23,14 @@ import java.io.File;
 
 import io.realm.RealmFieldType;
 import io.realm.datastorebenchmark.Benchmark;
-import io.realm.datastorebenchmark.TestDataStore;
+import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.internal.ReadTransaction;
 import io.realm.internal.SharedGroup;
 import io.realm.internal.Table;
 import io.realm.internal.TableView;
 import io.realm.internal.WriteTransaction;
 
-public class TestLowlevelRealm extends TestDataStore {
+public class TestLowlevelRealm extends DataStoreTest {
     private String TABLE_NAME = "dummy";
     private long numberOfIterations;
 
@@ -272,5 +272,10 @@ public class TestLowlevelRealm extends TestDataStore {
     @Override
     public void testDelete() {
         // TODO Implement this test
+    }
+
+    @Override
+    protected String getTag() {
+        return "realmlowlevel";
     }
 }

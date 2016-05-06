@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.datastorebenchmark.Benchmark;
-import io.realm.datastorebenchmark.TestDataStore;
+import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.datastorebenchmark.sugarorm.SugarEmployee;
 
-public class TestSugarOrm extends TestDataStore {
+public class TestSugarOrm extends DataStoreTest {
 
     private long numberOfIterations;
 
@@ -242,5 +242,10 @@ public class TestSugarOrm extends TestDataStore {
     @Override
     public void testDelete() {
         // TODO Implement this test
+    }
+
+    @Override
+    protected String getTag() {
+        return "sugarorm";
     }
 }

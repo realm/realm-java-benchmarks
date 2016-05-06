@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class TestDataStore {
+public abstract class DataStoreTest {
     protected Context context;
     protected Map<String, List<Long>> measurements;
     protected long numberOfObjects;
@@ -45,10 +45,10 @@ public abstract class TestDataStore {
     protected final String TEST_FULL_SCAN         = "FullScan";
     protected final String TEST_DELETE            = "Delete";
 
-    private String keys[] = {TEST_BATCH_WRITE, TEST_SIMPLE_WRITE, TEST_SIMPLE_QUERY,
-            TEST_FULL_SCAN, TEST_COUNT, TEST_SUM, TEST_DELETE};
+    private String keys[] = { TEST_BATCH_WRITE, TEST_SIMPLE_WRITE, TEST_SIMPLE_QUERY,
+            TEST_FULL_SCAN, TEST_COUNT, TEST_SUM, TEST_DELETE };
     
-    public TestDataStore(Context context, long numberOfObjects) {
+    public DataStoreTest(Context context, long numberOfObjects) {
         Log.i("DataStoreBenchmark", this.getClass().getName().toString());
         this.context = context;
         this.measurements = new HashMap<>();
@@ -62,20 +62,6 @@ public abstract class TestDataStore {
     protected void tearDown() {
         System.gc();
     }
-
-    public abstract void testSimpleWrite();
-
-    public abstract void testSimpleQuery();
-
-    public abstract void testBatchWrite();
-
-    public abstract void testSum();
-
-    public abstract void testCount();
-
-    public abstract void testFullScan();
-
-    public abstract void testDelete();
 
     public void allTests() {
         Class clazz = this.getClass();
@@ -108,7 +94,8 @@ public abstract class TestDataStore {
         }
     }
 
-    public void saveMeasurements(String tag, String filePrefix) {
+    public void saveMeasurements(String filePrefix) {
+        String tag = getTag();
         try {
             // one file per test with raw data
             for (String key : keys) {
@@ -141,4 +128,13 @@ public abstract class TestDataStore {
             e.printStackTrace();
         }
     }
+
+    public abstract void testSimpleWrite();
+    public abstract void testSimpleQuery();
+    public abstract void testBatchWrite();
+    public abstract void testSum();
+    public abstract void testCount();
+    public abstract void testFullScan();
+    public abstract void testDelete();
+    protected abstract String getTag();
 }
