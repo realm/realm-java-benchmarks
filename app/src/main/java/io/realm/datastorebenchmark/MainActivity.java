@@ -19,7 +19,7 @@ package io.realm.datastorebenchmark;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Environment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -36,7 +36,7 @@ import io.realm.datastorebenchmark.tests.TestSQLite;
 import io.realm.datastorebenchmark.tests.TestSugarOrm;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     final private long NUMBER_OF_ITERATIONS = 50;
     final private long NUMBER_OF_OBJECTS = 1000;
