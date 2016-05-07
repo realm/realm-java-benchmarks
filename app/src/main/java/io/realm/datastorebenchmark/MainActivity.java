@@ -57,11 +57,11 @@ public class MainActivity extends AppCompatActivity {
         // Configure which tests to run
         Context context = getApplicationContext();
         final List<DataStoreTest> tests = Arrays.asList(
-            new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestGreenDAO(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+            new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS), // Required for Speedup graphs
+            new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+//            new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+//            new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+//            new TestGreenDAO(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
 //            new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
 //            new TestSugarOrm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
         );
@@ -79,9 +79,13 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                boolean first = true;
                 for (DataStoreTest test : tests) {
                     test.allTests();
-                    test.saveHeader(TESTFILE_PREFIX);
+                    if (first) {
+                        test.saveHeader(TESTFILE_PREFIX);
+                        first = false;
+                    }
                     test.saveMeasurements(TESTFILE_PREFIX);
                 }
                 statusView.setText("Done");

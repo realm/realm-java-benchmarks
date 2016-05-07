@@ -4,7 +4,7 @@ There are lies, damn lies and benchmarks. This is an attempt of the latter.
 
 Benchmarks are just inherently difficult to make generic and really useful. We
 would always recommend users to do their own benchmarks for the particular
-usecases that's important to them. So go do that - after reading below!
+use-cases that's important to them. So go do that - after reading below!
 
 Done properly, it can still be relatively useful as a rough indicator of areas
 to investigate further. For developers it's also needed to be aware of
@@ -13,16 +13,17 @@ performance regressions.
 This is a benchmarking suite to compare Realm to SQLite (and possibly its
 derived ORMs) in a series of common and simple operations:
 
- * batch writes : write a bunch of objects in a single transaction
- * simple writes : write a bunch of objects in separate transactions
- * simple queries : perform a simple query filter on:
+ * Batch Writes : write a bunch of objects in a single transaction.
+ * Simple Writes : write a bunch of objects in separate transactions.
+ * Simple Queries : perform a simple query filter on:
      - int equality
      - string equality
      - int range
- * full scan : perform the simple query with conditions that ensures a full
+ * Full Scan : perform the simple query with conditions that ensures a full
    table scan and get the size of the result.
- * sum : sum the values of an int field
- * count : count the number of entries in a table
+ * Sum : sum the values of an int field
+ * Count : count the number of entries in a table.
+ * Delete: delete all entries in a table.
 
 # The Difficulties of Benchmarking
 
@@ -42,8 +43,8 @@ collection is executed during the test.
 
 To alleviate such issue there are a couple of options.
 
- * Using a robust algorithm to eliminate outliers, such as [RANSAC](https://en.wikipedia.org/wiki/RANSAC)
- * Measure multiple times **using the minimum value** among the measured ones
+ * Using a robust algorithm to eliminate outliers, such as [RANSAC](https://en.wikipedia.org/wiki/RANSAC).
+ * Measure multiple times **using the median value** among the measured ones.
 
 The second option is much easier to implement and takes care of any fluctuation
 and outlying measurement, so it's the one being used in this suite.
@@ -52,12 +53,13 @@ It is important to notice that the average is not a good option since it is
 influenced in a linear way from the outliers and median, while being better than
 average, is still influenced in a linear way.
 
+
 ### JIT
 
 If tests are being performed in a virtual machine that relies on just in time
-compilation (such as Dalvik) the first many runs of the tests will be influenced
-by the JIT execution. A way to alleviate this problem is to **perform some
-warm-up runs before starting to measure**.
+compilation (such as Dalvik or Art on Android N) the first many runs of the tests
+will be influenced by the JIT execution. A way to alleviate this problem is to
+**perform some warm-up runs before starting to measure**.
 
 ### Issues with Measuring Time
 
@@ -96,14 +98,13 @@ attention is paid to some details:
 
 The benchmark is mostly self-contained. Only the number of objects/rows can be
 varied. In file MainActivity.java, the constant `NUMBER_OF_OBJECTS` is exactly
-that parameter. The default is 10,000.
+that parameter. The default is 1,000.
 
 ## How to Analyze
 
 The Python script `tools/dsb.py` can be used to analyze and visualize the
-benchmark data. The script assumes that the raw data for runs for 100, 1000 and
-10000 objects stored in separate folders. The name of the folder is the number
-of objects/rows.
+benchmark data. The script assumes that the raw data for runs are saved in a
+subfolder named after the number of objects in the test, e.g "1000".
 
 You can validate the results by running the scripts as `tools/dsb.py -p -v`.
 Validation generates two different types of files:
@@ -129,7 +130,7 @@ This describes how to measure the speed relative to pure SQLite, which in
 most cases is the most relevant stat.
 
 1. Set NUMBER_OF_OBJECTS in MainActivity.java. The rest of this guide assumes
-   10000 which is the default.
+   1000 which is the default.
 
 2. Deploy the app to phone or emulator. It will auto-start and report *Done* in
    the UI when complete. Don't touch the phone while it is running.
@@ -139,20 +140,15 @@ most cases is the most relevant stat.
 4. Copy all results from the phone/emulator using ADB to folder named after
    NUMBER_OF_OBJECTS:
 
-
-    > adb pull /sdcard/Android/data/io.realm.datastorebenchmark/files/Documents/ ./10000
-
+    > adb pull /sdcard/datastorebenchmark/ ./1000
 
 5. Run python script:
 
-
-    > python dsb.py -d 10000 -s
-
+    > python dsb.py -p -v -s
 
 6. Speedup graph is found with
 
-
-    > open ./10000/speedup.png
+    > open ./1000/speedup.png
 
 ## Implicit or explicit transactions
 

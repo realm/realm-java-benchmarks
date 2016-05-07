@@ -22,3 +22,6 @@ local.properties
 
 # Navigation Editor
 .navigation
+
+# Benchmark results
+tools/1*

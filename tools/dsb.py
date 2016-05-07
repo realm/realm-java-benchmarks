@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 #
-# Copyright 2015 Realm Inc.
+# Copyright 2016 Realm Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,9 +23,15 @@ import matplotlib.patches as mpatches
 
 xkcdStyle = False # plot as Randall Munroe
 
-datastores = ['sqlite', 'realm', 'ormlite', 'greendao', 'realmlowlevel', 'sugarorm', 'couchbase'] # names of the tested data stores (see MainActivity.java)
-datasizes = []                                                                                    # NUMBER_OF_OBJECTS in MainActivity.java
-tests = ['BatchWrite', 'SimpleWrite', 'SimpleQuery', 'FullScan', 'Sum', 'Count', 'Delete']        # the benchmark (see TestDataStore.java)
+# List of names of possible tested data stores (see DataStoreTest#getTag())
+datastores = ['sqlite', 'realm', 'ormlite', 'greendao', 'realmlowlevel', 'sugarorm', 'couchbase']
+
+# Number of objects tested. It is assumed that all sub folders contain test data and are named after the number of
+# objects tested, e.g "./1000" or "./10000".
+datasizes = []
+
+# The individual benchmarks (see TestDataStore.java)
+tests = ['BatchWrite', 'SimpleWrite', 'SimpleQuery', 'FullScan', 'Sum', 'Count', 'Delete']
 
 # read the timer resolution
 def readTimer(datasize):
@@ -76,9 +82,10 @@ def benchmark(datasize):
                 if len(values) == 0:
                     y.append(0)
                 else:
+                    median = np.median(values)
                     if test == 'BatchWrite':
-                        values[0] = values[0] / float(datasize)
-                    y.append(1.0e9/values[0])
+                        median = median / float(datasize)
+                    y.append(1.0e9/median)
                 x.append(test.replace('Simple', ''))
                 c.append(colors[n % len(tests)])
                 n = n + 1
@@ -154,6 +161,7 @@ def speedup(datasize):
     print('Data size = ', datasize)
     if xkcdStyle:
         plt.xkcd()
+
     plt.figure()
     plt.title(str(datasize) + ' rows/objects')
     plt.ylabel('Speed up')
@@ -163,7 +171,7 @@ def speedup(datasize):
     colors = []
     for test in tests:
         (_, timings) = readValues(datasize, 'sqlite', test)
-        sqlite = float(timings[0])
+        sqlite = np.median(timings)
         patches = []
         for ds in dstores:
             if datastoreBenchmarked(datasize, ds):
@@ -177,43 +185,53 @@ def speedup(datasize):
                 (_, values) = readValues(datasize, ds, test)
                 value = 0
                 if len(values) > 0:
-                    value = float(values[0])
+                    value = np.median(values)
                     speedup = 0.0
                     if value < sqlite:
                         speedup = sqlite / value
                     else:
                         speedup = -value / sqlite
-                    colors.append(c)
+
+                    if (len(dstores) == 1 and speedup < 0):
+                        colors.append('red')
+                    else:
+                        colors.append(c)
                 else:
                     speedup = 0
                     colors.append('red')
                 x.append(test)
                 y.append(speedup)
-                print('  datastore = ', ds, ' test = ', test, ' spedup = ', speedup)
-            plt.legend(bbox_to_anchor=(1, 1),
-                bbox_transform=plt.gcf().transFigure,
-                handles=patches)
+                print('  datastore = ', ds, ' test = ', test, ' speedup = ', speedup)
+            plt.legend(bbox_to_anchor=(1, 1), bbox_transform=plt.gcf().transFigure, handles=patches)
             rects = plt.bar(np.arange(len(y)), y, color=colors)
+            i = 0
             for rect in rects:
                 height = rect.get_height()
-                plt.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%2.2f'%float(height),
-                    ha='center', va='bottom')
-        plt.xticks(np.arange(1, len(dstores)*len(tests), len(dstores)), tests)
+                value = y[i]
+                plt.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%2.2f'%float(value), ha='center', va='bottom')
+                i = i + 1
+
+        if (len(dstores) == 1):
+            plt.xticks(np.arange(0.4, len(tests), 1), tests)
+        else:
+            plt.xticks(np.arange(1, len(dstores)*len(tests), len(dstores)), tests)
+
+
         outFileName = str(datasize) + '/speedup.png'
         plt.savefig(outFileName)
         plt.close()
 
 def usage():
     print('dsb.py [-h] [-d <dir>] [-b] [-s] [-v] [-a] [-p] [-e <engine>] [-t test]')
-    print(' -d <dir> : only analyze these directories')
-    print(' -v       : validate')
-    print(' -a       : analyze')
-    print(' -s       : speed up graphs')
-    print(' -e <engine>: only these engines')
-    print(' -p       : plot raw data')
-    print(' -x       : XKCD style graphs')
-    print(' -t <test>: only these tests')
-    print(' -h       : this message')
+    print(' -d <dir>    : only analyze these directories')
+    print(' -v          : validate')
+    print(' -a          : analyze')
+    print(' -s          : speed up graphs compared to raw SQLite (Requires SQLite test).')
+    print(' -e <engine> : only these engines')
+    print(' -p          : plot raw data')
+    print(' -x          : XKCD style graphs')
+    print(' -t <test>   : only these tests')
+    print(' -h          : this message')
 
 def main(argv):
     global datasizes
@@ -223,7 +241,24 @@ def main(argv):
 
     xkcdStyle = False
 
-    datasizes = os.listdir('.')
+    # Automatically detect folders that should contain benchmark results
+    for dir in os.listdir('.'):
+        if os.path.isdir(dir) and unicode(dir, "utf-8").isnumeric():
+            datasizes.append(dir)
+
+    # Automatically detect which data stores have been tested
+    # We assume that all benchmark folders have the results from the same data stores
+    tested_datastores = set()
+    if len(datasizes) > 0:
+        for file in os.listdir("./" + datasizes[0]):
+            fileprefix = file.split('_')[0]
+            if fileprefix in datastores and fileprefix not in tested_datastores:
+                tested_datastores.add(fileprefix)
+    datastores = list(tested_datastores)
+
+    # Configure plots
+    font = { 'weight' : 'normal', 'size' : 10 }
+    plt.rc('font', **font)
 
     do_analyze = False
     do_validate = False
