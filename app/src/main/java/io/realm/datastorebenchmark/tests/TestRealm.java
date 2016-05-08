@@ -62,22 +62,20 @@ public class TestRealm extends DataStoreTest {
                 book.setAuthor(author);
             }
         }
-
         realm.commitTransaction();
     }
 
     private void verify(Realm realm) {
-        RealmResults<Employee> realmResults = realm.allObjects(Employee.class);
-        if (realmResults.size() != numberOfObjects) {
+        long objectCount = realm.where(Employee.class).count();
+        if (objectCount != numberOfObjects) {
             throw new RuntimeException(String.format("Number of objects is %d - %d expected.",
-                    realmResults.size(), numberOfObjects));
-
+                    objectCount, numberOfObjects));
         }
     }
 
     private void deleteObjects(Realm realm) {
         realm.beginTransaction();
-        realm.clear(Employee.class);
+        realm.delete(Employee.class);
         realm.commitTransaction();
     }
 
@@ -237,8 +235,8 @@ public class TestRealm extends DataStoreTest {
             @Override
             public void run() {
                 realm.beginTransaction();
-                realm.clear(Book.class);
-                realm.clear(Author.class);
+                realm.delete(Book.class);
+                realm.delete(Author.class);
                 realm.commitTransaction();
             }
         };
