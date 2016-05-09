@@ -31,9 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import io.realm.datastorebenchmark.tests.TestGreenDAO;
 import io.realm.datastorebenchmark.tests.TestLowlevelRealm;
-import io.realm.datastorebenchmark.tests.TestOrmLite;
 import io.realm.datastorebenchmark.tests.TestRealm;
 import io.realm.datastorebenchmark.tests.TestSQLite;
 
@@ -43,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     // Benchmark configuration
     public static final String OUTPUT_FOLDER = "datastorebenchmark";
     private static final String TESTFILE_PREFIX = "datastore";
-    private static final long NUMBER_OF_ITERATIONS = 50;
+    private static final long NUMBER_OF_ITERATIONS = 100;
     private static final long NUMBER_OF_OBJECTS = 1000;
 
     private Handler handler = new Handler();
@@ -58,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         Context context = getApplicationContext();
         final List<DataStoreTest> tests = Arrays.asList(
             new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS), // Required for Speedup graphs
-            new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
-//            new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+            new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+            new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
 //            new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
 //            new TestGreenDAO(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
 //            new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),

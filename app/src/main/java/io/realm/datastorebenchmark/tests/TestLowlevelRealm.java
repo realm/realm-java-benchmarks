@@ -21,12 +21,9 @@ import android.content.Context;
 
 import java.io.File;
 
-import io.realm.Realm;
 import io.realm.RealmFieldType;
 import io.realm.datastorebenchmark.Benchmark;
 import io.realm.datastorebenchmark.DataStoreTest;
-import io.realm.datastorebenchmark.realm.Author;
-import io.realm.datastorebenchmark.realm.Book;
 import io.realm.internal.ReadTransaction;
 import io.realm.internal.SharedGroup;
 import io.realm.internal.Table;

@@ -23,8 +23,6 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import io.realm.datastorebenchmark.Benchmark;
 import io.realm.datastorebenchmark.DataStoreTest;
-import io.realm.datastorebenchmark.realm.Author;
-import io.realm.datastorebenchmark.realm.Book;
 import io.realm.datastorebenchmark.realm.Employee;
 
 public class TestRealm extends DataStoreTest {

@@ -57,23 +57,6 @@ public class TestSQLite extends DataStoreTest {
                 + ")");
     }
 
-    private void addComplexTables() {
-        db.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_BOOK);
-        db.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_AUTHOR);
-
-        // We don't create foreign key constrains in SQL. It is assumed these are maintained in code instead
-        db.execSQL("CREATE TABLE " + dbHelper.TABLE_AUTHOR + " ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "name TEXT"
-                + ")");
-
-        db.execSQL("CREATE TABLE " + dbHelper.TABLE_BOOK + " ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "author_id INTEGER,"
-                + "name TEXT"
-                + ")");
-    }
-
     private void addRows() {
         SQLiteStatement stmt = db.compileStatement("INSERT INTO " + dbHelper.TABLE_SIMPLE+ " VALUES(?1, ?2, ?3, ?4)");
         db.beginTransaction();
@@ -84,28 +67,6 @@ public class TestSQLite extends DataStoreTest {
             stmt.bindLong(3, dataGenerator.getEmployeeAge(i));
             stmt.bindLong(4, dataGenerator.getEmployeeHiredStatusAsInt(i));
             stmt.executeInsert();
-        }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-    }
-
-
-    private void addRowsToComplexTables() {
-        SQLiteStatement authorStmt = db.compileStatement("INSERT INTO " + dbHelper.TABLE_AUTHOR + "(name) VALUES(?1)");
-        SQLiteStatement bookStmt = db.compileStatement("INSERT INTO " + dbHelper.TABLE_BOOK + "(author_id, name) VALUES(?1, ?2)");
-
-        db.beginTransaction();
-        for (int i = 0; i < numberOfObjects; i++) {
-            authorStmt.clearBindings();
-            authorStmt.bindString(1, "Author " + i);
-            long rowId = authorStmt.executeInsert();
-
-            for (long j = 0; j < numberOfObjects; j++) {
-                bookStmt.clearBindings();
-                bookStmt.bindLong(1, rowId);
-                bookStmt.bindString(2, "Book" + j);
-                bookStmt.executeInsert();
-            }
         }
         db.setTransactionSuccessful();
         db.endTransaction();
@@ -274,8 +235,7 @@ public class TestSQLite extends DataStoreTest {
 
             @Override
             public void setUp() {
-                addComplexTables();
-                addRowsToComplexTables();
+                addRows();
             }
 
             @Override
@@ -286,8 +246,7 @@ public class TestSQLite extends DataStoreTest {
             @Override
             public void run() {
                 db.beginTransaction();
-                db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_BOOK));
-                db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_AUTHOR));
+                db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_SIMPLE));
                 db.setTransactionSuccessful();
                 db.endTransaction();
             }
