@@ -37,13 +37,13 @@ public abstract class DataStoreTest {
 
     protected DataGenerator dataGenerator;
 
-    protected final String TEST_SIMPLE_QUERY      = "SimpleQuery";
-    protected final String TEST_SIMPLE_WRITE      = "SimpleWrite";
-    protected final String TEST_BATCH_WRITE       = "BatchWrite";
-    protected final String TEST_SUM               = "Sum";
-    protected final String TEST_COUNT             = "Count";
-    protected final String TEST_FULL_SCAN         = "FullScan";
-    protected final String TEST_DELETE            = "Delete";
+    protected final String TEST_SIMPLE_QUERY      = "SimpleQuery"; // Do a simple query and read 1 field
+    protected final String TEST_SIMPLE_WRITE      = "SimpleWrite"; // Insert a single object inside a transaction
+    protected final String TEST_BATCH_WRITE       = "BatchWrite";  // Insert multiple objects inside a transaction
+    protected final String TEST_SUM               = "Sum";         // Calculate the sum of a field on all objects
+    protected final String TEST_COUNT             = "Count";       // Count all objects in a table
+    protected final String TEST_FULL_SCAN         = "FullScan";    // Do a query that returns no results (= has to scan all elements)
+    protected final String TEST_DELETE            = "Delete";      // Delete all object in a table
 
     private String keys[] = { TEST_BATCH_WRITE, TEST_SIMPLE_WRITE, TEST_SIMPLE_QUERY,
             TEST_FULL_SCAN, TEST_COUNT, TEST_SUM, TEST_DELETE };
@@ -132,9 +132,9 @@ public abstract class DataStoreTest {
     public abstract void testSimpleWrite();
     public abstract void testSimpleQuery();
     public abstract void testBatchWrite();
-    public abstract void testSum();
-    public abstract void testCount();
     public abstract void testFullScan();
     public abstract void testDelete();
+    public abstract void testSum();
+    public abstract void testCount();
     protected abstract String getTag();
 }

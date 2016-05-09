@@ -38,6 +38,11 @@ public class TestRealm extends DataStoreTest {
         this.realmConfiguration = new RealmConfiguration.Builder(context).build();
     }
 
+    public void setUp() {
+        super.setUp();
+        Realm.deleteRealm(realmConfiguration);
+    }
+
     private void addObjects(Realm realm) {
         realm.beginTransaction();
         for (int i = 0; i < numberOfObjects; i++) {
@@ -46,21 +51,6 @@ public class TestRealm extends DataStoreTest {
             employee.setAge(dataGenerator.getEmployeeAge(i));
             employee.setHired(dataGenerator.getHiredBool(i));
             employee.setId(i);
-        }
-        realm.commitTransaction();
-    }
-
-    private void addBooks(Realm realm) {
-        realm.beginTransaction();
-        for (long i = 0; i < numberOfObjects; i++) {
-            Author author= realm.createObject(Author.class);
-            author.setName("Author " + i);
-
-            for (int j = 0; j < numberOfObjects; j++) {
-                Book book = realm.createObject(Book.class);
-                book.setName("Book: " + j);
-                book.setAuthor(author);
-            }
         }
         realm.commitTransaction();
     }
@@ -77,11 +67,6 @@ public class TestRealm extends DataStoreTest {
         realm.beginTransaction();
         realm.delete(Employee.class);
         realm.commitTransaction();
-    }
-
-    public void setUp() {
-        super.setUp();
-        Realm.deleteRealm(realmConfiguration);
     }
 
     @Override
@@ -118,136 +103,6 @@ public class TestRealm extends DataStoreTest {
         measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(numberOfIterations));
 
         tearDown();
-    }
-
-    @Override
-    public void testSum() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            private Realm realm;
-
-            @Override
-            public void setUp() {
-                realm = Realm.getInstance(realmConfiguration);
-                addObjects(realm);
-                verify(realm);
-            }
-
-            @Override
-            public void tearDown() {
-                deleteObjects(realm);
-                realm.close();
-            }
-
-            @Override
-            public void run() {
-                long sum = realm.where(Employee.class).sum("age").longValue();
-            }
-        };
-        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-
-    @Override
-    public void testCount() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            private Realm realm;
-
-            @Override
-            public void setUp() {
-                realm = Realm.getInstance(realmConfiguration);
-                addObjects(realm);
-                verify(realm);
-            }
-
-            @Override
-            public void tearDown() {
-                deleteObjects(realm);
-                realm.close();
-            }
-
-            @Override
-            public void run() {
-                long count = realm.where(Employee.class).count();
-            }
-        };
-        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-
-    @Override
-    public void testFullScan() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            private Realm realm;
-
-            @Override
-            public void setUp() {
-                realm = Realm.getInstance(realmConfiguration);
-                addObjects(realm);
-                verify(realm);
-            }
-
-            @Override
-            public void tearDown() {
-                deleteObjects(realm);
-                realm.close();
-            }
-
-            @Override
-            public void run() {
-                RealmResults<Employee> realmResults = realm.where(Employee.class)
-                    .equalTo("hired", true)
-                    .between("age", -2, -1)
-                    .equalTo("name", "Smile1").findAll();
-                long count = realmResults.size();
-            }
-        };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-
-    @Override
-    public void testDelete() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            private Realm realm;
-
-            @Override
-            public void setUp() {
-                realm = Realm.getInstance(realmConfiguration);
-                addBooks(realm);
-            }
-
-            @Override
-            public void tearDown() {
-                realm.close();
-            }
-
-            @Override
-            public void run() {
-                realm.beginTransaction();
-                realm.delete(Book.class);
-                realm.delete(Author.class);
-                realm.commitTransaction();
-            }
-        };
-        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-
-    public void tearDown() {
-        Realm.deleteRealm(realmConfiguration);
-        super.tearDown();
     }
 
     @Override
@@ -318,6 +173,133 @@ public class TestRealm extends DataStoreTest {
             }
         };
         measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
+    public void testFullScan() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            private Realm realm;
+
+            @Override
+            public void setUp() {
+                realm = Realm.getInstance(realmConfiguration);
+                addObjects(realm);
+                verify(realm);
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects(realm);
+                realm.close();
+            }
+
+            @Override
+            public void run() {
+                RealmResults<Employee> realmResults = realm.where(Employee.class)
+                        .equalTo("hired", true)
+                        .between("age", -2, -1)
+                        .equalTo("name", "Smile1").findAll();
+                long count = realmResults.size();
+            }
+        };
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
+    public void testDelete() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            private Realm realm;
+
+            @Override
+            public void setUp() {
+                realm = Realm.getInstance(realmConfiguration);
+                addObjects(realm);
+            }
+
+            @Override
+            public void tearDown() {
+                realm.close();
+            }
+
+            @Override
+            public void run() {
+                realm.beginTransaction();
+                realm.delete(Employee.class);
+                realm.commitTransaction();
+            }
+        };
+        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+
+
+
+    @Override
+    public void testSum() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            private Realm realm;
+
+            @Override
+            public void setUp() {
+                realm = Realm.getInstance(realmConfiguration);
+                addObjects(realm);
+                verify(realm);
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects(realm);
+                realm.close();
+            }
+
+            @Override
+            public void run() {
+                long sum = realm.where(Employee.class).sum("age").longValue();
+            }
+        };
+        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
+    public void testCount() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            private Realm realm;
+
+            @Override
+            public void setUp() {
+                realm = Realm.getInstance(realmConfiguration);
+                addObjects(realm);
+                verify(realm);
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects(realm);
+                realm.close();
+            }
+
+            @Override
+            public void run() {
+                long count = realm.where(Employee.class).count();
+            }
+        };
+        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
 
         tearDown();
     }

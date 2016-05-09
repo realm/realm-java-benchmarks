@@ -35,6 +35,18 @@ public class TestSQLite extends DataStoreTest {
         this.numberOfIterations = numberOfIterations;
     }
 
+    protected void setUp() {
+        super.setUp();
+        dbHelper = new SQLiteDatabaseHelper(context);
+        db = dbHelper.getWritableDatabase();
+    }
+
+    protected void tearDown() {
+        super.tearDown();
+        db.close();
+        dbHelper.close();
+    }
+
     private void addSimpleTable() {
         db.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_SIMPLE);
         db.execSQL("CREATE TABLE " + dbHelper.TABLE_SIMPLE + " ("
@@ -124,18 +136,6 @@ public class TestSQLite extends DataStoreTest {
         db.endTransaction();
     }
 
-    protected void setUp() {
-        super.setUp();
-        dbHelper = new SQLiteDatabaseHelper(context);
-        db = dbHelper.getWritableDatabase();
-    }
-
-    protected void tearDown() {
-        db.close();
-        dbHelper.close();
-        super.tearDown();
-    }
-
     @Override
     public void testSimpleQuery() {
         setUp();
@@ -172,6 +172,44 @@ public class TestSQLite extends DataStoreTest {
     }
 
     @Override
+    public void testSimpleWrite() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            private SQLiteStatement stmt;
+            private int i;
+
+            @Override
+            public void setUp() {
+                addSimpleTable();
+                stmt = db.compileStatement("INSERT INTO " + dbHelper.TABLE_SIMPLE + " VALUES(?1, ?2, ?3, ?4)");
+                i = 0;
+            }
+
+            @Override
+            public void tearDown() {
+                deleteRows();
+            }
+
+            @Override
+            public void run() {
+                stmt.clearBindings();
+                stmt.bindLong(1, i);
+                stmt.bindString(2, dataGenerator.getEmployeeName(i));
+                stmt.bindLong(3, dataGenerator.getEmployeeAge(i));
+                db.beginTransaction();
+                stmt.executeInsert();
+                db.setTransactionSuccessful();
+                db.endTransaction();
+                i++;
+            }
+        };
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
     public void testBatchWrite() {
         setUp();
 
@@ -192,6 +230,69 @@ public class TestSQLite extends DataStoreTest {
             }
         };
         measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
+    public void testFullScan() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            @Override
+            public void setUp() {
+                addSimpleTable();
+                addRows();
+                verify();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteRows();
+            }
+
+            @Override
+            public void run() {
+                Cursor cursor = db.rawQuery("SELECT * FROM " + dbHelper.TABLE_SIMPLE
+                        + " WHERE hired = 1 AND age BETWEEN -2 AND -1 AND name = 'Smile1'", null);
+                int count = cursor.getCount();
+                cursor.close();
+            }
+        };
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
+    public void testDelete() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            private SQLiteStatement stmt;
+            private int i;
+
+            @Override
+            public void setUp() {
+                addComplexTables();
+                addRowsToComplexTables();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteComplexTableRows();
+            }
+
+            @Override
+            public void run() {
+                db.beginTransaction();
+                db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_BOOK));
+                db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_AUTHOR));
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            }
+        };
+        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
 
         tearDown();
     }
@@ -252,106 +353,6 @@ public class TestSQLite extends DataStoreTest {
             }
         };
         measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-
-    @Override
-    public void testFullScan() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            @Override
-            public void setUp() {
-                addSimpleTable();
-                addRows();
-                verify();
-            }
-
-            @Override
-            public void tearDown() {
-                deleteRows();
-            }
-
-            @Override
-            public void run() {
-                Cursor cursor = db.rawQuery("SELECT * FROM " + dbHelper.TABLE_SIMPLE
-                + " WHERE hired = 1 AND age BETWEEN -2 AND -1 AND name = 'Smile1'", null);
-                int count = cursor.getCount();
-                cursor.close();
-            }
-        };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-
-    @Override
-    public void testDelete() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            private SQLiteStatement stmt;
-            private int i;
-
-            @Override
-            public void setUp() {
-                addComplexTables();
-                addRowsToComplexTables();
-            }
-
-            @Override
-            public void tearDown() {
-                deleteComplexTableRows();
-            }
-
-            @Override
-            public void run() {
-                db.beginTransaction();
-                db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_BOOK));
-                db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_AUTHOR));
-                db.setTransactionSuccessful();
-                db.endTransaction();
-            }
-        };
-        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-    @Override
-    public void testSimpleWrite() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            private SQLiteStatement stmt;
-            private int i;
-
-            @Override
-            public void setUp() {
-                addSimpleTable();
-                stmt = db.compileStatement("INSERT INTO " + dbHelper.TABLE_SIMPLE + " VALUES(?1, ?2, ?3, ?4)");
-                i = 0;
-            }
-
-            @Override
-            public void tearDown() {
-                deleteRows();
-            }
-
-            @Override
-            public void run() {
-                stmt.clearBindings();
-                stmt.bindLong(1, i);
-                stmt.bindString(2, dataGenerator.getEmployeeName(i));
-                stmt.bindLong(3, dataGenerator.getEmployeeAge(i));
-                db.beginTransaction();
-                stmt.executeInsert();
-                db.setTransactionSuccessful();
-                db.endTransaction();
-                i++;
-            }
-        };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
 
         tearDown();
     }

@@ -21,9 +21,12 @@ import android.content.Context;
 
 import java.io.File;
 
+import io.realm.Realm;
 import io.realm.RealmFieldType;
 import io.realm.datastorebenchmark.Benchmark;
 import io.realm.datastorebenchmark.DataStoreTest;
+import io.realm.datastorebenchmark.realm.Author;
+import io.realm.datastorebenchmark.realm.Book;
 import io.realm.internal.ReadTransaction;
 import io.realm.internal.SharedGroup;
 import io.realm.internal.Table;
@@ -181,6 +184,70 @@ public class TestLowlevelRealm extends DataStoreTest {
     }
 
     @Override
+    public void testFullScan() {
+        Benchmark benchmark = new Benchmark() {
+            private SharedGroup sharedGroup;
+
+            @Override
+            public void setUp() {
+                sharedGroup = addTable();
+                addRows(sharedGroup);
+                verify(sharedGroup);
+            }
+
+            @Override
+            public void tearDown() {
+                sharedGroup.close();
+            }
+
+            @Override
+            public void run() {
+                ReadTransaction readTransaction = sharedGroup.beginRead();
+                Table table = readTransaction.getTable(TABLE_NAME);
+                TableView tableView = table.where()
+                        .equalTo(new long[]{3}, true)
+                        .between(new long[]{2}, -2, -1)
+                        .equalTo(new long[]{1}, "Smile1")
+                        .findAll();
+                long count = tableView.size();
+                readTransaction.endRead();
+            }
+        };
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+    }
+
+    @Override
+    public void testDelete() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            private SharedGroup sharedGroup;
+
+            @Override
+            public void setUp() {
+                sharedGroup = addTable();
+                addRows(sharedGroup);
+                verify(sharedGroup);
+            }
+
+            @Override
+            public void tearDown() {
+                sharedGroup.close();
+            }
+
+            @Override
+            public void run() {
+                WriteTransaction writeTransaction = sharedGroup.beginWrite();
+                writeTransaction.getTable(TABLE_NAME).clear();
+                writeTransaction.commit();
+            }
+        };
+        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
     public void testSum() {
         Benchmark benchmark = new Benchmark() {
             private SharedGroup sharedGroup;
@@ -234,44 +301,6 @@ public class TestLowlevelRealm extends DataStoreTest {
             }
         };
         measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
-    }
-
-    @Override
-    public void testFullScan() {
-        Benchmark benchmark = new Benchmark() {
-            private SharedGroup sharedGroup;
-
-            @Override
-            public void setUp() {
-                sharedGroup = addTable();
-                addRows(sharedGroup);
-                verify(sharedGroup);
-            }
-
-            @Override
-            public void tearDown() {
-                sharedGroup.close();
-            }
-
-            @Override
-            public void run() {
-                ReadTransaction readTransaction = sharedGroup.beginRead();
-                Table table = readTransaction.getTable(TABLE_NAME);
-                TableView tableView = table.where()
-                        .equalTo(new long[]{3}, true)
-                        .between(new long[]{2}, -2, -1)
-                        .equalTo(new long[]{1}, "Smile1")
-                        .findAll();
-                long count = tableView.size();
-                readTransaction.endRead();
-            }
-        };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
-    }
-
-    @Override
-    public void testDelete() {
-        // TODO Implement this test
     }
 
     @Override
