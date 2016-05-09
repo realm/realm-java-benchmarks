@@ -129,26 +129,37 @@ graphs as `<NUMBER_OF_OBJECTS>/speedup.png`.
 This describes how to measure the speed relative to pure SQLite, which in
 most cases is the most relevant stat.
 
-1. Set NUMBER_OF_OBJECTS in MainActivity.java. The rest of this guide assumes
-   1000 which is the default.
+1. Set NUMBER_OF_OBJECTS in `app/src/main/java/io.realm.datastorebenchmark.MainActivity.java`.
+   The rest of this guide assumes `1000` which is the default.
 
 2. Deploy the app to phone or emulator. It will auto-start and report *Done* in
    the UI when complete. Don't touch the phone while it is running.
 
-3. Stand in the `./tools` folder.
+       > ./gradlew installDebug
+       > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
+
+3. Goto the`./tools` folder.
+
+       > cd tools
 
 4. Copy all results from the phone/emulator using ADB to folder named after
    NUMBER_OF_OBJECTS:
 
-    > adb pull /sdcard/datastorebenchmark/ ./1000
+       > adb pull /sdcard/datastorebenchmark/ ./1000
 
 5. Run python script:
 
-    > python dsb.py -p -v -s
+       > python dsb.py -p -v -s
 
 6. Speedup graph is found with
 
-    > open ./1000/speedup.png
+       > open ./1000/speedup.png
+
+7. Histograms and raw plots are also generated. These can be used to verify
+   that the test ran smoothly.
+
+       > ls ./1000/ | grep .png
+
 
 ## Implicit or explicit transactions
 
