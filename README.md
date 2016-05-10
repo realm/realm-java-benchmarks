@@ -94,6 +94,19 @@ attention is paid to some details:
  * And of course always try to be fair in the comparison and actually compare
    apples to apples.
 
+## Implicit or explicit transactions
+
+SQLite and Realm's object store are both using implicit read transaction. That
+is, you don't have to embed read operations and queries in transactions. Of
+course, when inserting, updating or removing rows or objects from either
+SQLite or Realm, explicit write transactions are used. The implicit read
+transactions are not directly measured.
+
+The `in.realm.internal` is also included in the benchmark under the name Realm
+Low Level. This benchmark is used internally by Realm to measure the overhead
+of the object store. As `io.realm.internal` is using explicit read
+transactions, in some cases `io.realm.internal` will appear slower.
+
 ## How to Run
 
 The benchmark is mostly self-contained. Only the number of objects/rows can be
@@ -159,17 +172,3 @@ most cases is the most relevant stat.
    that the test ran smoothly.
 
        > ls ./1000/ | grep .png
-
-
-## Implicit or explicit transactions
-
-SQLite and Realm's object store are both using implicit read transaction. That
-is, you don't have to embed read operations and queries in transactions. Of
-course, when inserting, updating or removing rows or objects from either
-SQLite or Realm, explicit write transactions are used. The implicit read
-transactions are not directly measured.
-
-The `in.realm.internal` is also included in the benchmark under the name Realm
-Low Level. This benchmark is used internally by Realm to measure the overhead
-of the object store. As `io.realm.internal` is using explicit read
-transactions, in some cases `io.realm.internal` will appear slower.

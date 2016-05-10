@@ -90,9 +90,7 @@ def benchmark(datasize):
                 c.append(colors[n % len(tests)])
                 n = n + 1
 
-    plt.legend(bbox_to_anchor=(1, 1),
-        bbox_transform=plt.gcf().transFigure,
-        handles=patches)
+    plt.legend(bbox_to_anchor=(1, 1), bbox_transform=plt.gcf().transFigure, handles=patches)
     t = [test.replace('Simple', '') for test in tests]
     rects = plt.bar(np.arange(len(y)), y, color=c)
     plt.xticks(np.arange(1, len(datastores)*len(tests), len(datastores)), t)
@@ -159,67 +157,84 @@ def analyze(datasize):
 def speedup(datasize):
     dstores = [s for s in datastores if s != 'sqlite']
     print('Data size = ', datasize)
-    if xkcdStyle:
-        plt.xkcd()
 
-    plt.figure()
-    plt.title(str(datasize) + ' rows/objects')
-    plt.ylabel('Speed up')
-    plt.xlabel('Test')
-    x = []
-    y = []
-    colors = []
+    # Read and categorize all test data into bucketes for each test type
+    testdata = {} # Map between datastore and tests
     for test in tests:
         (_, timings) = readValues(datasize, 'sqlite', test)
         sqlite = np.median(timings)
-        patches = []
+        data = []
+        colors = []
         for ds in dstores:
-            if datastoreBenchmarked(datasize, ds):
-                if ds == 'realm':
-                    c = 'green'
-                elif ds == 'realmlowlevel':
-                    c = 'blue'
+            (_, values) = readValues(datasize, ds, test)
+            value = 0
+            if len(values) > 0:
+                value = np.median(values)
+                speedup = 0.0
+                if value < sqlite:
+                    speedup = sqlite / value
                 else:
-                    c = 'yellow'
-                patches.append(mpatches.Patch(color=c, label=ds))
-                (_, values) = readValues(datasize, ds, test)
-                value = 0
-                if len(values) > 0:
-                    value = np.median(values)
-                    speedup = 0.0
-                    if value < sqlite:
-                        speedup = sqlite / value
-                    else:
-                        speedup = -value / sqlite
+                    speedup = -value / sqlite
+            else:
+                speedup = 0
 
-                    if (len(dstores) == 1 and speedup < 0):
-                        colors.append('red')
-                    else:
-                        colors.append(c)
-                else:
-                    speedup = 0
-                    colors.append('red')
-                x.append(test)
-                y.append(speedup)
-                print('  datastore = ', ds, ' test = ', test, ' speedup = ', speedup)
-            plt.legend(bbox_to_anchor=(1, 1), bbox_transform=plt.gcf().transFigure, handles=patches)
-            rects = plt.bar(np.arange(len(y)), y, color=colors)
-            i = 0
-            for rect in rects:
-                height = rect.get_height()
-                value = y[i]
-                plt.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%2.2f'%float(value), ha='center', va='bottom')
-                i = i + 1
+            if not ds in testdata.keys():
+                testdata[ds] = { "data": [] }
 
-        if (len(dstores) == 1):
-            plt.xticks(np.arange(0.4, len(tests), 1), tests)
-        else:
-            plt.xticks(np.arange(1, len(dstores)*len(tests), len(dstores)), tests)
+            testdata[ds]['data'].append(speedup)
+            print('  datastore = ', ds, ' test = ', test, ' speedup = ', speedup)
 
 
-        outFileName = str(datasize) + '/speedup.png'
-        plt.savefig(outFileName)
-        plt.close()
+    # Plot all data: Group each datastore for each benchmark
+    fig, ax = plt.subplots()
+    if xkcdStyle:
+        plt.xkcd()
+
+    plt.title(str(datasize) + ' rows/objects')
+    plt.ylabel('Speed up')
+    plt.xlabel('Test')
+
+    i = 0
+    legend_bar = []
+    legend_labels = []
+    for key in testdata:
+        N = len(testdata[key]['data'])
+        data = testdata[key]['data']
+        ind = np.arange(N)
+        width = 0.35
+        c = 'yellow'
+        if (key == 'realmlowlevel'):
+            c = 'blue'
+        elif (key == 'realm'):
+            c = 'green'
+
+        type = ax.bar(ind + (width * i), data, width, color=c)
+        autolabel(type, data, ax)
+        legend_bar.append(type[0])
+        legend_labels.append(key)
+        i = i + 1
+
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(tests)
+    plt.legend(legend_bar, legend_labels)
+
+    outFileName = str(datasize) + '/speedup.png'
+    plt.savefig(outFileName)
+    plt.close()
+
+# attach some text labels
+def autolabel(rects, data, ax):
+    i = 0
+    for rect in rects:
+        height = rect.get_height()
+        val = data[i]
+        mod = 1
+        if (val < 0):
+            mod = 0
+        ax.text(rect.get_x() + rect.get_width()/2., (height + 0.) * mod,
+                '%2.2f'%float(val),
+                ha='center', va='bottom')
+        i = i + 1
 
 def usage():
     print('dsb.py [-h] [-d <dir>] [-b] [-s] [-v] [-a] [-p] [-e <engine>] [-t test]')
@@ -257,7 +272,7 @@ def main(argv):
     datastores = list(tested_datastores)
 
     # Configure plots
-    font = { 'weight' : 'normal', 'size' : 10 }
+    font = { 'weight' : 'normal', 'size' : 8 }
     plt.rc('font', **font)
 
     do_analyze = False
