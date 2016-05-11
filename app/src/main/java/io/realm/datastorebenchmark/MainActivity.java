@@ -62,8 +62,7 @@ public class MainActivity extends AppCompatActivity {
             new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
             new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
             new TestGreenDao(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
-//            new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-//            new TestSugarOrm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
+            // new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
         );
 
         // Does our preferred timer work?
