@@ -24,7 +24,7 @@ import matplotlib.patches as mpatches
 xkcdStyle = False # plot as Randall Munroe
 
 # List of names of possible tested data stores (see DataStoreTest#getTag())
-datastores = ['sqlite', 'realm', 'ormlite', 'greendao', 'realmlowlevel', 'sugarorm', 'couchbase']
+datastores = ['sqlite', 'realm', 'ormlite', 'greendao', 'realmlowlevel', 'couchbase']
 
 # Number of objects tested. It is assumed that all sub folders contain test data and are named after the number of
 # objects tested, e.g "./1000" or "./10000".

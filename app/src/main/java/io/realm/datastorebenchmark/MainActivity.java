@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import io.realm.datastorebenchmark.tests.TestGreenDao;
+import io.realm.datastorebenchmark.tests.TestGreenDaoFix;
 import io.realm.datastorebenchmark.tests.TestLowlevelRealm;
 import io.realm.datastorebenchmark.tests.TestOrmLite;
 import io.realm.datastorebenchmark.tests.TestRealm;
@@ -61,9 +61,8 @@ public class MainActivity extends AppCompatActivity {
             new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
             new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
             new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestGreenDao(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
-//            new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-//            new TestSugarOrm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);
+            new TestGreenDaoFix(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+            // new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
         );
 
         // Does our preferred timer work?
