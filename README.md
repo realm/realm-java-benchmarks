@@ -14,13 +14,13 @@ This is a benchmarking suite to compare Realm to SQLite (and possibly its
 derived ORMs) in a series of common and simple operations:
 
  * Batch Writes : write a bunch of objects in a single transaction.
- * Simple Writes : write a bunch of objects in separate transactions.
+ * Simple Writes : write an object in a single transaction.
  * Simple Queries : perform a simple query filter on:
      - int equality
      - string equality
      - int range
- * Full Scan : perform the simple query with conditions that ensures a full
-   table scan and get the size of the result.
+ * Full Scan : perform a simple query that doesn't match any results (= a full
+   table scan).
  * Sum : sum the values of an int field
  * Count : count the number of entries in a table.
  * Delete: delete all entries in a table.
@@ -31,6 +31,7 @@ Benchmarking is hard. Micro-benchmarking is even harder. Micro-benchmarking Java
 even more so.
 
 Here are some of the common problems that have to be taken into consideration:
+
 
 ## System Induced Variance
 
@@ -47,7 +48,7 @@ To alleviate such issue there are a couple of options.
  * Measure multiple times **using the median value** among the measured ones.
 
 The second option is much easier to implement and takes care of any fluctuation
-and outlying measurement, so it's the one being used in this suite.
+and outlying measurements, so it's the one being used in this suite.
 
 It is important to notice that the average is not a good option since it is
 influenced in a linear way from the outliers and median, while being better than
@@ -81,6 +82,7 @@ Many modern devices has CPU's that saves power by reducing the speed of the CPU
 and only increasing the speed when there is a need. For that reason it's also a
 good idea to warm-up the CPU.
 
+
 ## User Induced Variance
 
 It is extremely easy to influence the measurement of a benchmark if not enough
@@ -93,6 +95,7 @@ attention is paid to some details:
    overhead that needs to be taken into consideration.
  * And of course always try to be fair in the comparison and actually compare
    apples to apples.
+
 
 ## Implicit or explicit transactions
 
@@ -107,11 +110,13 @@ Low Level. This benchmark is used internally by Realm to measure the overhead
 of the object store. As `io.realm.internal` is using explicit read
 transactions, in some cases `io.realm.internal` will appear slower.
 
+
 ## How to Run
 
 The benchmark is mostly self-contained. Only the number of objects/rows can be
 varied. In file MainActivity.java, the constant `NUMBER_OF_OBJECTS` is exactly
 that parameter. The default is 1,000.
+
 
 ## How to Analyze
 
@@ -134,19 +139,26 @@ calculate mimimum, average, maximum, and other values.
 
 By running the script as `tools/dsb.py -s` relative speed up compared to SQLite
 is reported. If SQLite is faster, a negative number is reported. You find the
-graphs as `<NUMBER_OF_OBJECTS>/speedup.png`.
+graphs as `<NUMBER_OF_OBJECTS>/speedup.png`. The median for each datastore is
+used to determine the speedup.`
+
+Running the script with `tools/dsb.py -b` will generate benchmark plots for the
+different benchmark tasks. You find the graphs as `benchmark_<test>.png`. The
+output is a box-and-whisker plot using an IQR of 1.5 and with hidden outliers.
+For more information about how to interpret a box plot, read
+http://www.purplemath.com/modules/boxwhisk.htm.
 
 
 ## How to analyse - TLDR version
 
-This describes how to measure the speed relative to pure SQLite, which in
-most cases is the most relevant stat.
+This describes how to benchmark the different datastores supported by this test
+suite.
 
 1. Set NUMBER_OF_OBJECTS in `app/src/main/java/io.realm.datastorebenchmark.MainActivity.java`.
    The rest of this guide assumes `1000` which is the default.
 
-2. Deploy the app to phone or emulator. It will auto-start and report *Done* in
-   the UI when complete. Don't touch the phone while it is running.
+2. Deploy the app to the phone or emulator. It will auto-start and report *Done*
+   in the UI when complete. Don't touch the phone while it is running.
 
        > ./gradlew installDebug
        > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
@@ -166,17 +178,7 @@ most cases is the most relevant stat.
 
 6. The script will generate a number of plots:
 
-    a) Regular benchmark plots comparing each datastore on a given task. The output is a box-and-whisker plot using
-      an IQR of 1.5 and with hidden outliers. For more information about how to interpret a box plot, read
-      http://www.purplemath.com/modules/boxwhisk.htm.
-
-      The benchmarks plots can be found in `./1000/benchmark_<test>.png`.
-
-    b) A speedup graph showing a comparison with raw SQLite as the baseline. The median of each test is used.
-       The speedup plot can be found in `./1000/speedup.png`.
-
-    c) Histograms of the raw measurements. These can be used to verify the distribution of the raw data.
-       The histograms can be found in `./1000/hist_<datastore>_<test>.png`
-
-    d) A raw plot of all measurements. These can be used to visually inspect the raw data.
-       The raw plots can be found in `./1000/raw_<datastore>_<test>.png`.
+    * The benchmarks plots can be found in `./1000/benchmark_<test>.png`.
+    * The speedup plot can be found in `./1000/speedup.png`.
+    * The histograms can be found in `./1000/hist_<datastore>_<test>.png`
+    * The raw plots can be found in `./1000/raw_<datastore>_<test>.png`.
