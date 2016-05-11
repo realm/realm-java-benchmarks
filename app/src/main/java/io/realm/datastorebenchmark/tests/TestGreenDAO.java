@@ -91,7 +91,6 @@ public class TestGreenDao extends DataStoreTest {
 
             @Override
             public void setUp() {
-                delete();
                 index = 0;
             }
 
@@ -121,7 +120,6 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }
@@ -157,7 +155,6 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
             }
 
             @Override
@@ -190,7 +187,6 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }
@@ -223,7 +219,6 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
             }
 
@@ -257,7 +252,6 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }
@@ -291,7 +285,6 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }

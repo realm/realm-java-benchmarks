@@ -80,6 +80,11 @@ public class TestOrmLite extends DataStoreTest {
             }
 
             @Override
+            public void tearDown() {
+                deleteObjects();
+            }
+
+            @Override
             public void run() {
                 try {
                     Dao<Employee, Long> dao = Employee.getDao();
@@ -88,15 +93,9 @@ public class TestOrmLite extends DataStoreTest {
                     employee.setHired(dataGenerator.getHiredBool(i));
                     employee.setAge(dataGenerator.getEmployeeAge(i));
                     dao.create(employee);
-                    i++;
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
-            }
-
-            @Override
-            public void tearDown() {
-                deleteObjects();
             }
         };
         measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
@@ -112,6 +111,11 @@ public class TestOrmLite extends DataStoreTest {
             public void setUp() {
                 addObjects();
                 verify();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects();
             }
 
             @Override
@@ -133,11 +137,6 @@ public class TestOrmLite extends DataStoreTest {
                     throw new RuntimeException(e);
                 }
             }
-
-            @Override
-            public void tearDown() {
-                deleteObjects();
-            }
         };
         measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(numberOfIterations));
         tearDown();
@@ -152,6 +151,11 @@ public class TestOrmLite extends DataStoreTest {
             @Override
             public void setUp() {
                 connectionSource = dbHelper.getConnectionSource();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects();
             }
 
             @Override
@@ -175,71 +179,8 @@ public class TestOrmLite extends DataStoreTest {
                     throw new RuntimeException(e);
                 }
             }
-
-            @Override
-            public void tearDown() {
-                deleteObjects();
-            }
         };
         measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
-        tearDown();
-    }
-
-    @Override
-    public void testSum() {
-        setUp();
-        Benchmark benchmark = new Benchmark() {
-            @Override
-            public void setUp() {
-                addObjects();
-                verify();
-            }
-
-            @Override
-            public void run() {
-                try {
-                    Dao<Employee, Long> dao = Employee.getDao();
-                    GenericRawResults<String[]> queryResult = dao.queryBuilder().selectRaw("SUM(age)").queryRaw();
-                    String sum = queryResult.getFirstResult()[0];
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public void tearDown() {
-                deleteObjects();
-            }
-        };
-        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
-        tearDown();
-    }
-
-    @Override
-    public void testCount() {
-        setUp();
-        Benchmark benchmark = new Benchmark() {
-            @Override
-            public void setUp() {
-                addObjects();
-                verify();
-            }
-
-            @Override
-            public void run() {
-                try {
-                    long count = Employee.getDao().countOf();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public void tearDown() {
-                deleteObjects();
-            }
-        };
-        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
         tearDown();
     }
 
@@ -252,6 +193,11 @@ public class TestOrmLite extends DataStoreTest {
             public void setUp() {
                 addObjects();
                 verify();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects();
             }
 
             @Override
@@ -270,11 +216,6 @@ public class TestOrmLite extends DataStoreTest {
                     throw new RuntimeException(e);
                 }
             }
-
-            @Override
-            public void tearDown() {
-                deleteObjects();
-            }
         };
         measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
         tearDown();
@@ -282,7 +223,88 @@ public class TestOrmLite extends DataStoreTest {
 
     @Override
     public void testDelete() {
-        // TODO Implement this test
+        setUp();
+        Benchmark benchmark = new Benchmark() {
+            @Override
+            public void setUp() {
+                addObjects();
+                verify();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects();
+            }
+
+            @Override
+            public void run() {
+                try {
+                    TableUtils.clearTable(dbHelper.getConnectionSource(), Employee.class);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
+        tearDown();
+    }
+
+    @Override
+    public void testSum() {
+        setUp();
+        Benchmark benchmark = new Benchmark() {
+            @Override
+            public void setUp() {
+                addObjects();
+                verify();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects();
+            }
+
+            @Override
+            public void run() {
+                try {
+                    Dao<Employee, Long> dao = Employee.getDao();
+                    GenericRawResults<String[]> queryResult = dao.queryBuilder().selectRaw("SUM(age)").queryRaw();
+                    String sum = queryResult.getFirstResult()[0];
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
+        tearDown();
+    }
+
+    @Override
+    public void testCount() {
+        setUp();
+        Benchmark benchmark = new Benchmark() {
+            @Override
+            public void setUp() {
+                addObjects();
+                verify();
+            }
+
+            @Override
+            public void tearDown() {
+                deleteObjects();
+            }
+
+            @Override
+            public void run() {
+                try {
+                    long count = Employee.getDao().countOf();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
+        tearDown();
     }
 
     @Override
