@@ -54,49 +54,35 @@ def readValues(datasize, datastore, test):
 def datastoreBenchmarked(datasize, datastore):
     return os.path.exists(str(datasize) + '/' + datastore + '_Sum.csv')
 
+# Plot the output of each benchmark to its own file
 def benchmark(datasize):
-    x = []
-    y = []
-    c = []
-    patches = []
-    colors = ['green', 'blue', 'red']
-    if xkcdStyle:
-        plt.xkcd()
-    plt.figure()
-    plt.title('Data stores comparison')
-    plt.ylabel('Operations/time')
-    plt.tick_params(axis='both', which='both',
-        bottom='off', top='off')
-
-    n = 0
-    for datastore in datastores:
-        if datastoreBenchmarked(datasize, datastore):
-            patches.append(mpatches.Patch(color=colors[n % len(tests)], label=datastore))
-            n = n + 1
-
     for test in tests:
-        n = 0
+        data = []
+        labels = []
+        datastores.sort()
         for datastore in datastores:
+            labels.append(datastore)
             if datastoreBenchmarked(datasize, datastore):
                 (_, values) = readValues(datasize, datastore, test)
-                if len(values) == 0:
-                    y.append(0)
-                else:
-                    median = np.median(values)
-                    if test == 'BatchWrite':
-                        median = median / float(datasize)
-                    y.append(1.0e9/median)
-                x.append(test.replace('Simple', ''))
-                c.append(colors[n % len(tests)])
-                n = n + 1
+                if test == 'BatchWrite':
+                    # Normalize batch measurement to 1 row
+                    values = [val/float(datasize) for val in values]
 
-    plt.legend(bbox_to_anchor=(1, 1), bbox_transform=plt.gcf().transFigure, handles=patches)
-    t = [test.replace('Simple', '') for test in tests]
-    rects = plt.bar(np.arange(len(y)), y, color=c)
-    plt.xticks(np.arange(1, len(datastores)*len(tests), len(datastores)), t)
-    outFileName = str(datasize) + '/timings.png'
-    plt.savefig(outFileName)
-    plt.close()
+                values = [1.0e9/val for val in values] # Convert to ops/sec
+                data.append(values)
+
+        if xkcdStyle:
+            plt.xkcd()
+
+        # Plot API: http://matplotlib.org/1.3.1/api/pyplot_api.html
+        plt.title('Data stores comparison - ' + test)
+        plt.ylabel('Ops/sec')
+        plt.boxplot(data, whis=1.5, sym='') # Box-and-Whisker plot with an IQR of 1.5 and hidden outliers.
+        plt.xticks(np.arange(1, len(labels) + 1), labels)
+
+        outFileName = str(datasize) + '/benchmark_' + test +'.png'
+        plt.savefig(outFileName)
+        plt.close()
 
 def validate(datasize):
     for test in tests:
@@ -241,6 +227,7 @@ def usage():
     print(' -d <dir>    : only analyze these directories')
     print(' -v          : validate')
     print(' -a          : analyze')
+    print(' -b          : plot benchmarks as ops/sec')
     print(' -s          : speed up graphs compared to raw SQLite (Requires SQLite test).')
     print(' -e <engine> : only these engines')
     print(' -p          : plot raw data')
