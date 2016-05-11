@@ -162,13 +162,21 @@ most cases is the most relevant stat.
 
 5. Run python script:
 
-       > python dsb.py -p -v -s
+       > python dsb.py -p -v -s -b
 
-6. Speedup graph is found with
+6. The script will generate a number of plots:
 
-       > open ./1000/speedup.png
+    a) Regular benchmark plots comparing each datastore on a given task. The output is a box-and-whisker plot using
+      an IQR of 1.5 and with hidden outliers. For more information about how to interpret a box plot, read
+      http://www.purplemath.com/modules/boxwhisk.htm.
 
-7. Histograms and raw plots are also generated. These can be used to verify
-   that the test ran smoothly.
+      The benchmarks plots can be found in `./1000/benchmark_<test>.png`.
 
-       > ls ./1000/ | grep .png
+    b) A speedup graph showing a comparison with raw SQLite as the baseline. The median of each test is used.
+       The speedup plot can be found in `./1000/speedup.png`.
+
+    c) Histograms of the raw measurements. These can be used to verify the distribution of the raw data.
+       The histograms can be found in `./1000/hist_<datastore>_<test>.png`
+
+    d) A raw plot of all measurements. These can be used to visually inspect the raw data.
+       The raw plots can be found in `./1000/raw_<datastore>_<test>.png`.
