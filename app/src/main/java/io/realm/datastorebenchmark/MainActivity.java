@@ -33,6 +33,7 @@ import java.util.Locale;
 
 import io.realm.datastorebenchmark.tests.TestGreenDao;
 import io.realm.datastorebenchmark.tests.TestLowlevelRealm;
+import io.realm.datastorebenchmark.tests.TestOrmLite;
 import io.realm.datastorebenchmark.tests.TestRealm;
 import io.realm.datastorebenchmark.tests.TestSQLite;
 
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS), // Required for Speedup graphs
             new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
             new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-//            new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+            new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
             new TestGreenDao(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
 //            new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
 //            new TestSugarOrm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS);

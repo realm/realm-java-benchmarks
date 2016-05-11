@@ -181,18 +181,22 @@ def speedup(datasize):
     plt.xlabel('Test')
 
     i = 0
+    orm_colors = ['yellow', 'orange']
+    orm_index = 0
     legend_bar = []
     legend_labels = []
     for key in testdata:
         N = len(testdata[key]['data'])
         data = testdata[key]['data']
         ind = np.arange(N)
-        width = 0.35
-        c = 'yellow'
+        width = 0.90 / len(dstores)
         if (key == 'realmlowlevel'):
             c = 'blue'
         elif (key == 'realm'):
             c = 'green'
+        else:
+            c = orm_colors[orm_index]
+            orm_index = orm_index + 1
 
         type = ax.bar(ind + (width * i), data, width, color=c)
         autolabel(type, data, ax)
@@ -217,7 +221,7 @@ def autolabel(rects, data, ax):
         mod = 1
         if (val < 0):
             mod = 0
-        ax.text(rect.get_x() + rect.get_width()/2., (height + 0.) * mod,
+        ax.text(rect.get_x() + rect.get_width()/2., (height + 0.1) * mod,
                 '%2.2f'%float(val),
                 ha='center', va='bottom')
         i = i + 1
