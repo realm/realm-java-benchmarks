@@ -239,9 +239,6 @@ public class TestRealm extends DataStoreTest {
         tearDown();
     }
 
-
-
-
     @Override
     public void testSum() {
         setUp();

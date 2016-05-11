@@ -1,10 +1,13 @@
 package io.realm.datastorebenchmark.tests;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.dao.query.QueryBuilder;
 import io.realm.datastorebenchmark.Benchmark;
 import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.datastorebenchmark.greendao.DaoMaster;
@@ -12,8 +15,7 @@ import io.realm.datastorebenchmark.greendao.DaoSession;
 import io.realm.datastorebenchmark.greendao.Employee;
 import io.realm.datastorebenchmark.greendao.EmployeeDao;
 
-public class TestGreenDAO extends DataStoreTest {
-
+public class TestGreenDao extends DataStoreTest {
 
     private long numberOfIterations;
 
@@ -23,7 +25,7 @@ public class TestGreenDAO extends DataStoreTest {
     private EmployeeDao employeeDao;
 
 
-    public TestGreenDAO(Context context, long numberOfObjects, long numberOfIterations) {
+    public TestGreenDao(Context context, long numberOfObjects, long numberOfIterations) {
         super(context, numberOfObjects);
         this.numberOfIterations = numberOfIterations;
     }
@@ -67,8 +69,7 @@ public class TestGreenDAO extends DataStoreTest {
         }
     }
     public void setUp() {
-        DaoMaster.DevOpenHelper helper
-                = new DaoMaster.DevOpenHelper(context, "EmployeeGreenDAO.db", null);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "EmployeeGreenDAO.db", null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
@@ -86,9 +87,12 @@ public class TestGreenDAO extends DataStoreTest {
         setUp();
 
         Benchmark benchmark = new Benchmark() {
+            public int index;
+
             @Override
             public void setUp() {
                 delete();
+                index = 0;
             }
 
             @Override
@@ -98,22 +102,11 @@ public class TestGreenDAO extends DataStoreTest {
 
             @Override
             public void run() {
-                for (int i = 0; i < numberOfObjects; i++) {
-                    try {
-                        db.beginTransaction();
-                        Employee employee = new Employee();
-                        employee.setName(dataGenerator.getEmployeeName(i));
-                        employee.setAge(dataGenerator.getEmployeeAge(i));
-                        employee.setHired(dataGenerator.getHiredBool(i));
-                        employeeDao.insert(employee);
-                        db.setTransactionSuccessful();
-                    } catch (Exception e) {
-                        throw new RuntimeException("Cannot add object.");
-                    } finally {
-                        db.endTransaction();
-                    }
-                }
-
+                Employee employee = new Employee();
+                employee.setName(dataGenerator.getEmployeeName(index));
+                employee.setAge(dataGenerator.getEmployeeAge(index));
+                employee.setHired(dataGenerator.getHiredBool(index));
+                employeeDao.insert(employee);
             }
         };
         measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
@@ -140,7 +133,7 @@ public class TestGreenDAO extends DataStoreTest {
 
             @Override
             public void run() {
-                de.greenrobot.dao.query.QueryBuilder qb = employeeDao.queryBuilder();
+                QueryBuilder qb = employeeDao.queryBuilder();
                 qb.where(qb.and(EmployeeDao.Properties.Name.eq("Foo1"),
                         EmployeeDao.Properties.Age.between(20, 50),
                         EmployeeDao.Properties.Hired.eq(true)));
@@ -174,24 +167,85 @@ public class TestGreenDAO extends DataStoreTest {
 
             @Override
             public void run() {
+                List<Employee> data = new ArrayList<>();
+                for (int i = 0; i < numberOfObjects; i++) {
+                    Employee employee = new Employee();
+                    employee.setName(dataGenerator.getEmployeeName(i));
+                    employee.setAge(dataGenerator.getEmployeeAge(i));
+                    employee.setHired(dataGenerator.getHiredBool(i));
+                    data.add(employee);
+                }
+                employeeDao.insertInTx(data);
+            }
+        };
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
+    public void testFullScan() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            @Override
+            public void setUp() {
+                delete();
+                addObjects();
+                verify();
+            }
+
+            @Override
+            public void tearDown() {
+                delete();
+            }
+
+            @Override
+            public void run() {
+                QueryBuilder qb = employeeDao.queryBuilder();
+                qb.where(qb.and(EmployeeDao.Properties.Name.eq("Smile1"),
+                        EmployeeDao.Properties.Age.between(-2, -1),
+                        EmployeeDao.Properties.Hired.eq(false)));
+                qb.build();
+                List<Employee> list = qb.list();
+                int count = list.size();
+            }
+        };
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+
+        tearDown();
+    }
+
+    @Override
+    public void testDelete() {
+        setUp();
+
+        Benchmark benchmark = new Benchmark() {
+            @Override
+            public void setUp() {
+                delete();
+                addObjects();
+            }
+
+            @Override
+            public void tearDown() {
+                delete();
+            }
+
+            @Override
+            public void run() {
                 try {
                     db.beginTransaction();
-                    for (int i = 0; i < numberOfObjects; i++) {
-                        Employee employee = new Employee();
-                        employee.setName(dataGenerator.getEmployeeName(i));
-                        employee.setAge(dataGenerator.getEmployeeAge(i));
-                        employee.setHired(dataGenerator.getHiredBool(i));
-                        employeeDao.insert(employee);
-                    }
+                    employeeDao.deleteAll();
                     db.setTransactionSuccessful();
-                } catch (Exception e) {
-                    throw new RuntimeException("Cannot add object.");
+                }  catch (Exception e) {
+                    throw new RuntimeException("Cannot delete objects.");
                 } finally {
                     db.endTransaction();
                 }
             }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
 
         tearDown();
     }
@@ -215,11 +269,14 @@ public class TestGreenDAO extends DataStoreTest {
 
             @Override
             public void run() {
-                List<Employee> list = employeeDao.loadAll();
-                int tmp = 0;
-                for (Employee e : list) {
-                    tmp += e.getAge();
-                }
+                // GreenDao doesn't support aggregate functions: https://github.com/greenrobot/greenDAO/issues/89
+                Cursor cursor = employeeDao.getDatabase().rawQuery(
+                        "SELECT SUM("+ EmployeeDao.Properties.Age.columnName +") AS sum FROM " + EmployeeDao.TABLENAME,
+                        null
+                );
+                cursor.moveToFirst();
+                long sum = cursor.getLong(0);
+                cursor.close();
             }
         };
         measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
@@ -246,51 +303,12 @@ public class TestGreenDAO extends DataStoreTest {
 
             @Override
             public void run() {
-                List<Employee> list = employeeDao.loadAll();
-                int tmp = list.size();
+                long count = employeeDao.count();
             }
         };
         measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
 
         tearDown();
-    }
-
-    @Override
-    public void testFullScan() {
-        setUp();
-
-        Benchmark benchmark = new Benchmark() {
-            @Override
-            public void setUp() {
-                delete();
-                addObjects();
-                verify();
-            }
-
-            @Override
-            public void tearDown() {
-                delete();
-            }
-
-            @Override
-            public void run() {
-                de.greenrobot.dao.query.QueryBuilder qb = employeeDao.queryBuilder();
-                qb.where(qb.and(EmployeeDao.Properties.Name.eq("Smile1"),
-                        EmployeeDao.Properties.Age.between(-2, -1),
-                        EmployeeDao.Properties.Hired.eq(false)));
-                qb.build();
-                List<Employee> list = qb.list();
-                int count = list.size();
-            }
-        };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
-
-        tearDown();
-    }
-
-    @Override
-    public void testDelete() {
-        // TODO Implement this test
     }
 
     @Override
