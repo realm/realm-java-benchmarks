@@ -15,7 +15,7 @@ import io.realm.datastorebenchmark.greendao.DaoSession;
 import io.realm.datastorebenchmark.greendao.Employee;
 import io.realm.datastorebenchmark.greendao.EmployeeDao;
 
-public class TestGreenDaoFix extends DataStoreTest {
+public class TestGreenDao extends DataStoreTest {
 
     private long numberOfIterations;
 
@@ -25,7 +25,7 @@ public class TestGreenDaoFix extends DataStoreTest {
     private EmployeeDao employeeDao;
 
 
-    public TestGreenDaoFix(Context context, long numberOfObjects, long numberOfIterations) {
+    public TestGreenDao(Context context, long numberOfObjects, long numberOfIterations) {
         super(context, numberOfObjects);
         this.numberOfIterations = numberOfIterations;
     }
