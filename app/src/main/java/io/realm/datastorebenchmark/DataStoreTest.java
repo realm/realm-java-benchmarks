@@ -70,7 +70,7 @@ public abstract class DataStoreTest {
             String name = method.getName();
             if (name.startsWith("test")) {
                 try {
-                    Log.i("DataStoreBenchmark", "invoking " + method.getName());
+                    Log.i("DataStoreBenchmark", "invoking " + getTag() + ":" + method.getName());
                     method.invoke(this);
                 } catch (Exception e) {
                     e.printStackTrace();

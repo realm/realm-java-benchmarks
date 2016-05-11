@@ -89,14 +89,6 @@ public class TestSQLite extends DataStoreTest {
         db.endTransaction();
     }
 
-    private void deleteComplexTableRows() {
-        db.beginTransaction();
-        db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_BOOK));
-        db.execSQL(String.format("DELETE FROM %s", dbHelper.TABLE_AUTHOR));
-        db.setTransactionSuccessful();
-        db.endTransaction();
-    }
-
     @Override
     public void testSimpleQuery() {
         setUp();
@@ -240,7 +232,7 @@ public class TestSQLite extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                deleteComplexTableRows();
+                deleteRows();
             }
 
             @Override
