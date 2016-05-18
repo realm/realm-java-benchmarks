@@ -16,11 +16,15 @@
 
 package io.realm.datastorebenchmark;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
@@ -48,22 +52,12 @@ public class MainActivity extends AppCompatActivity {
 
     private Handler handler = new Handler();
 
+    final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextView statusView = (TextView) findViewById(R.id.textView);
-
-        // Configure which tests to run
-        Context context = getApplicationContext();
-        final List<DataStoreTest> tests = Arrays.asList(
-            new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS), // Required for Speedup graphs
-            new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-            new TestGreenDao(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
-            // new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
-        );
 
         // Does our preferred timer work?
         checkCpuTimeNanos();
@@ -73,23 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
         // resolution/granularity of timer
         measureTimerResolution(outputFolder);
-
-        // Run tests
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                boolean first = true;
-                for (DataStoreTest test : tests) {
-                    test.allTests();
-                    if (first) {
-                        test.saveHeader(TESTFILE_PREFIX);
-                        first = false;
-                    }
-                    test.saveMeasurements(TESTFILE_PREFIX);
-                }
-                statusView.setText("Done");
-            }
-        }, 800);
     }
 
     /**
@@ -133,12 +110,66 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void runBenchmarks() {
+        final TextView statusView = (TextView) findViewById(R.id.textView);
+
+        // Configure which tests to run
+        Context context = getApplicationContext();
+        final List<DataStoreTest> tests = Arrays.asList(
+                new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS), // Required for Speedup graphs
+                new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+                new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+                new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
+                new TestGreenDao(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+                // new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+        );
+
+        // Run tests
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                boolean first = true;
+                for (DataStoreTest test : tests) {
+                    test.allTests();
+                    if (first) {
+                        test.saveHeader(TESTFILE_PREFIX);
+                        first = false;
+                    }
+                    test.saveMeasurements(TESTFILE_PREFIX);
+                }
+                statusView.setText("Done");
+            }
+        }, 800);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    runBenchmarks();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Cannot run benchmarks");
+                    builder.create();
+                }
+                return;
+            }
+        }
+    }
+
     /**
      * Create the output directory that should hold all the test results. All previous results will be deleted.
      *
      * @return a reference to the created (and empty) directory.
      */
     private File createOutputDirectory() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+
         File directory = new File(Environment.getExternalStorageDirectory() + "/" + OUTPUT_FOLDER);
         if (!directory.mkdirs() && !directory.exists()) {
             throw new IllegalStateException("Could not create output folder: " + directory);
