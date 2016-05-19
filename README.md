@@ -114,7 +114,7 @@ transactions, in some cases `io.realm.internal` will appear slower.
 ## How to Run
 
 The benchmark is mostly self-contained. Only the number of objects/rows can be
-varied. In file MainActivity.java, the constant `NUMBER_OF_OBJECTS` is exactly
+varied. In file `MainActivity.java`, the constant `NUMBER_OF_OBJECTS` is exactly
 that parameter. The default is 1,000.
 
 
