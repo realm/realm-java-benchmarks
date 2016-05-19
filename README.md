@@ -140,7 +140,7 @@ calculate mimimum, average, maximum, and other values.
 By running the script as `tools/dsb.py -s` relative speed up compared to SQLite
 is reported. If SQLite is faster, a negative number is reported. You find the
 graphs as `<NUMBER_OF_OBJECTS>/speedup.png`. The median for each datastore is
-used to determine the speedup.`
+used to determine the speedup.
 
 Running the script with `tools/dsb.py -b` will generate benchmark plots for the
 different benchmark tasks. You find the graphs as `benchmark_<test>.png`. The
@@ -161,6 +161,7 @@ suite.
    in the UI when complete. Don't touch the phone while it is running.
 
        > ./gradlew installDebug
+      
        > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
 
 3. Goto the`./tools` folder.
