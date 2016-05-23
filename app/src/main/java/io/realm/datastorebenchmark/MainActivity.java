@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         // Run tests
+        statusView.setText("Running benchmarks...");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
