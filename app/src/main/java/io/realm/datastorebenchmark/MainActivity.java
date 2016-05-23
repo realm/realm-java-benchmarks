@@ -45,7 +45,10 @@ import io.realm.datastorebenchmark.tests.TestSQLite;
 public class MainActivity extends AppCompatActivity {
 
     // Benchmark configuration
-    public static final String OUTPUT_FOLDER = "datastorebenchmark";
+    // Number of iterations should be high enough to include any warmup period. The worst outliers
+    // will be filtered out by only plotting the interquartile range and the median will not be
+    // effected either way.
+    private static final String OUTPUT_FOLDER = "datastorebenchmark";
     private static final String TESTFILE_PREFIX = "datastore";
     private static final long NUMBER_OF_ITERATIONS = 100;
     private static final long NUMBER_OF_OBJECTS = 1000;
