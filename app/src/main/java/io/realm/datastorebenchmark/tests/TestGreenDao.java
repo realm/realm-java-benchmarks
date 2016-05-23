@@ -74,11 +74,11 @@ public class TestGreenDao extends DataStoreTest {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         employeeDao = daoSession.getEmployeeDao();
+        employeeDao.dropTable(db, true);
         employeeDao.createTable(db, true);
     }
 
     public void tearDown() {
-        employeeDao.dropTable(db, true);
         db.close();
     }
 

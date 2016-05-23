@@ -58,7 +58,7 @@ average, is still influenced in a linear way.
 ### JIT
 
 If tests are being performed in a virtual machine that relies on just in time
-compilation (such as Dalvik or Art on Android N) the first many runs of the tests
+compilation (such as Dalvik or ART on Android N) the first many runs of the tests
 will be influenced by the JIT execution. A way to alleviate this problem is to
 **perform some warm-up runs before measuring**.
 
@@ -117,23 +117,76 @@ transactions, in some cases `io.realm.internal` will appear slower.
 ## How to Run
 
 The benchmark is mostly self-contained. Only the number of objects/rows can be
-varied. In file `MainActivity.java`, the constant `NUMBER_OF_OBJECTS` is exactly
-that parameter. The default is 1,000.
+varied.
+
+Run the benchmark the following way:
+
+1. Set `NUMBER_OF_OBJECTS` in `app/src/main/java/io.realm.datastorebenchmark.MainActivity.java`.
+   The rest of this guide assumes `1000`, which is also the default value.
+
+2. Deploy the app to the phone or emulator. It will auto-start and report *Done*
+   in the UI when complete. Don't touch the phone while it is running.
+
+       > ./gradlew installDebug
+       > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
 
 
-## How to Analyze
+## How to analyse - TLDR
+
+The benchmark results from the supported datastores are analyzed the following way.
+
+1. Goto the `tools` folder.
+
+       > cd tools
+
+2. Copy all results from the phone/emulator using ADB to folder named after
+   `NUMBER_OF_OBJECTS`:
+
+       > adb pull /sdcard/datastorebenchmark/ ./1000
+
+3. Run python script:
+
+       > python dsb.py -b
+
+4. Benchmark plots can be found in `./1000/benchmark_<TEST>.png` The plots are
+   [box-and-whisker plots](https://en.wikipedia.org/wiki/Box_plot) with an
+   [IQR](https://en.wikipedia.org/wiki/Interquartile_range) of 1.5.
+
+   This means a plot is read in the following way:
+
+    ```
+    +---+---+ +1.5 IQR or Max, whatever is lower
+        |
+        |
+    +---+---+ 75th percentile
+    |       |
+    |       |
+    +-------+ Median
+    |       |
+    |       |
+    +---+---+ 25th percentile
+        |
+        |
+    +---+---+ -1.5 IQR or Min, whatever is higher
+    ```
+
+
+## How to Analyze - Extended
 
 The Python script `tools/dsb.py` can be used to analyze and visualize the
 benchmark data. The script assumes that the raw data for runs are saved in a
 subfolder named after the number of objects in the test, e.g "1000".
 
 You can validate the results by running the scripts as `tools/dsb.py -p -v`.
-Validation generates two different types of files:
+Validation generates two different types of plots:
 
-1. All measurement as function of time/iteration. Android/Java can have strange
-   spikes (due to JIT, GC, and implementation of `System.nanoTime()`), and this
-   type of graph gives you an idea if your raw data fluctuate much. You find the
-   graphs as `<NUMBER_OF_OBJECTS>/raw_<DATASTORE>_<TEST>.png`.
+1. Raw plots that output all measurements as a function of time/iteration. Java
+   can have strange spikes (due to JIT, GC, and implementation of
+   `System.nanoTime()`). It also gives you an idea of the number of iterations 
+   are correct. If measurements fluctuate too much, then you must increase the 
+   number of iterations. 
+   You find the graphs as `<NUMBER_OF_OBJECTS>/raw_<DATASTORE>_<TEST>.png`.
+
 2. Histogram (10 bins) is calculated so you can see if the raw data is grouped.
    You find the histograms as `<NUMBER_OF_OBJECTS>/hist_<DATASTORE>_<TEST>.png`.
 
@@ -146,43 +199,7 @@ graphs as `<NUMBER_OF_OBJECTS>/speedup.png`. The median for each datastore is
 used to determine the speedup.
 
 Running the script with `tools/dsb.py -b` will generate benchmark plots for the
-different benchmark tasks. You find the graphs as `benchmark_<test>.png`. The
+different benchmark tasks. You find the graphs as `benchmark_<TEST>.png`. The
 output is a box-and-whisker plot using an IQR of 1.5 and with hidden outliers.
 For more information about how to interpret a box plot, read
 http://www.purplemath.com/modules/boxwhisk.htm.
-
-
-## How to analyse - TLDR version
-
-This describes how to benchmark the different data stores supported by this test
-suite.
-
-1. Set `NUMBER_OF_OBJECTS` in `app/src/main/java/io.realm.datastorebenchmark.MainActivity.java`.
-   The rest of this guide assumes `1000` which is the default.
-
-2. Deploy the app to the phone or emulator. It will auto-start and report *Done*
-   in the UI when complete. Don't touch the phone while it is running.
-
-       > ./gradlew installDebug
-      
-       > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
-
-3. Goto the`./tools` folder.
-
-       > cd tools
-
-4. Copy all results from the phone/emulator using ADB to folder named after
-   `NUMBER_OF_OBJECTS`:
-
-       > adb pull /sdcard/datastorebenchmark/ ./1000
-
-5. Run python script:
-
-       > python dsb.py -p -v -s -b
-
-6. The script will generate a number of plots:
-
-    * The benchmarks plots can be found in `./1000/benchmark_<test>.png`.
-    * The speedup plot can be found in `./1000/speedup.png`.
-    * The histograms can be found in `./1000/hist_<datastore>_<test>.png`
-    * The raw plots can be found in `./1000/raw_<datastore>_<test>.png`.
