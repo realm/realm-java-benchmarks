@@ -192,9 +192,9 @@ def plot_speedup(datasize):
     legend_bar = []
     legend_labels = []
     for key in testdata:
-        datasize = len(testdata[key]['data'])
+        data_count = len(testdata[key]['data'])
         data = testdata[key]['data']
-        ind = np.arange(datasize)
+        ind = np.arange(data_count)
         width = 0.90 / len(dstores)
         if key == 'realmlowlevel':
             color = 'blue'
@@ -205,7 +205,7 @@ def plot_speedup(datasize):
             orm_index = orm_index + 1
 
         barplot = axis.bar(ind + (width * i), data, width, color=color)
-        autolabel(barplot, data, barplot)
+        autolabel(barplot, data, axis)
         legend_bar.append(barplot[0])
         legend_labels.append(key)
         i = i + 1
@@ -254,7 +254,7 @@ def main(argv):
 
     # Automatically detect folders that should contain benchmark results
     for folder in os.listdir('.'):
-        if os.path.isdir(folder) and unicode(dir, "utf-8").isnumeric():
+        if os.path.isdir(folder) and unicode(folder, "utf-8").isnumeric():
             DATASIZES.append(folder)
 
     # Automatically detect which data stores have been tested
