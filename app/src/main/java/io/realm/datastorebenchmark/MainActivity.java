@@ -24,6 +24,7 @@ import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -44,6 +45,8 @@ import io.realm.datastorebenchmark.tests.TestSQLite;
 
 public class MainActivity extends AppCompatActivity {
 
+    final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+
     // Benchmark configuration
     // Number of iterations should be high enough to include any warmup period. The worst outliers
     // will be filtered out by only plotting the interquartile range and the median will not be
@@ -54,22 +57,38 @@ public class MainActivity extends AppCompatActivity {
     private static final long NUMBER_OF_OBJECTS = 1000;
 
     private Handler handler = new Handler();
-
-    final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    private TextView statusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        statusView = (TextView) findViewById(R.id.textView);
+        requestWritePermission();
+    }
 
-        // Does our preferred timer work?
-        checkCpuTimeNanos();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    runBenchmarks();
+                } else {
+                    statusView.setText("Cannot run the benchmarks without write permission!");
+                }
+            }
+        }
+    }
 
-        // Create folder used to store benchmark results.
-        File outputFolder = createOutputDirectory();
-
-        // resolution/granularity of timer
-        measureTimerResolution(outputFolder);
+    private void requestWritePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        } else {
+            runBenchmarks();
+        }
     }
 
     /**
@@ -114,7 +133,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runBenchmarks() {
-        final TextView statusView = (TextView) findViewById(R.id.textView);
+
+        // Does our preferred timer work?
+        checkCpuTimeNanos();
+
+        // Create folder used to store benchmark results.
+        File outputFolder = createOutputDirectory();
+
+        // resolution/granularity of timer
+        measureTimerResolution(outputFolder);
 
         // Configure which tests to run
         Context context = getApplicationContext();
@@ -146,34 +173,12 @@ public class MainActivity extends AppCompatActivity {
         }, 800);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    runBenchmarks();
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Cannot run benchmarks");
-                    builder.create();
-                }
-                return;
-            }
-        }
-    }
-
     /**
      * Create the output directory that should hold all the test results. All previous results will be deleted.
      *
      * @return a reference to the created (and empty) directory.
      */
     private File createOutputDirectory() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-
         File directory = new File(Environment.getExternalStorageDirectory() + "/" + OUTPUT_FOLDER);
         if (!directory.mkdirs() && !directory.exists()) {
             throw new IllegalStateException("Could not create output folder: " + directory);
