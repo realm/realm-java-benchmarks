@@ -121,8 +121,8 @@ varied.
 
 Run the benchmark the following way:
 
-1. Set NUMBER_OF_OBJECTS in `app/src/main/java/io.realm.datastorebenchmark.MainActivity.java`.
-   The rest of this guide assumes `1000` which is the default.
+1. Set `NUMBER_OF_OBJECTS` in `app/src/main/java/io.realm.datastorebenchmark.MainActivity.java`.
+   The rest of this guide assumes `1000`, which is also the default value.
 
 2. Deploy the app to the phone or emulator. It will auto-start and report *Done*
    in the UI when complete. Don't touch the phone while it is running.
@@ -135,12 +135,12 @@ Run the benchmark the following way:
 
 The benchmark results from the supported datastores are analyzed the following way.
 
-1. Goto the`./tools` folder.
+1. Goto the `tools` folder.
 
        > cd tools
 
 2. Copy all results from the phone/emulator using ADB to folder named after
-   NUMBER_OF_OBJECTS:
+   `NUMBER_OF_OBJECTS`:
 
        > adb pull /sdcard/datastorebenchmark/ ./1000
 
@@ -182,8 +182,10 @@ Validation generates two different types of plots:
 
 1. Raw plots that output all measurement as a function of time/iteration. Java
    can have strange spikes (due to JIT, GC, and implementation of
-   `System.nanoTime()`), and this type of graph gives  you an idea if your raw
-   data fluctuate much. You find the graphs as `<NUMBER_OF_OBJECTS>/raw_<DATASTORE>_<TEST>.png`.
+   `System.nanoTime()`). It also gives you an idea of the number of iterations 
+   are correct. If measurements fluctuate to much, then you must increase the 
+   number of iterations. 
+   You find the graphs as `<NUMBER_OF_OBJECTS>/raw_<DATASTORE>_<TEST>.png`.
 
 2. Histogram (10 bins) is calculated so you can see if the raw data is grouped.
    You find the histograms as `<NUMBER_OF_OBJECTS>/hist_<DATASTORE>_<TEST>.png`.
