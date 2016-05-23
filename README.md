@@ -183,7 +183,7 @@ Validation generates two different types of plots:
 1. Raw plots that output all measurements as a function of time/iteration. Java
    can have strange spikes (due to JIT, GC, and implementation of
    `System.nanoTime()`). It also gives you an idea of the number of iterations 
-   are correct. If measurements fluctuate to much, then you must increase the 
+   are correct. If measurements fluctuate too much, then you must increase the 
    number of iterations. 
    You find the graphs as `<NUMBER_OF_OBJECTS>/raw_<DATASTORE>_<TEST>.png`.
 
