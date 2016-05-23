@@ -3,7 +3,7 @@
 There are lies, damn lies and benchmarks. This is an attempt of the latter.
 
 Benchmarks are inherently difficult to make generic and really useful. We
-would always recommend users to do their own benchmarks for the particular
+always recommend users to perform their own benchmarks for the particular
 use-cases that's important to them. So go do that - after reading below!
 
 Done properly, it can still be relatively useful as a rough indicator of areas
@@ -11,14 +11,14 @@ to investigate further. For developers it's also needed to be aware of
 performance regressions.
 
 This is a benchmarking suite to compare Realm to SQLite (and possibly its
-derived ORMs) in a series of common and simple operations:
+derived ORMs) in a series of common operations:
 
  * Batch Writes : write a bunch of objects in a single transaction.
  * Simple Writes : write an object in a single transaction.
  * Simple Queries : perform a simple query filter on:
-     - int equality
+     - integer equality
      - string equality
-     - int range
+     - integer range
  * Full Scan : perform a simple query that doesn't match any results (= a full
    table scan).
  * Sum : sum the values of an int field
@@ -47,7 +47,7 @@ To alleviate such issue there are a couple of options.
  * Using a robust algorithm to eliminate outliers, such as [RANSAC](https://en.wikipedia.org/wiki/RANSAC).
  * Measure multiple times **using the median value** among the measured ones.
 
-The second option is much easier to implement and takes care of any fluctuation
+The second option is much easier to implement and takes care of any fluctuating
 and outlying measurements, so it's the one being used in this suite.
 
 It is important to notice that the average is not a good option since it is
@@ -60,7 +60,7 @@ average, is still influenced in a linear way.
 If tests are being performed in a virtual machine that relies on just in time
 compilation (such as Dalvik or ART on Android N) the first many runs of the tests
 will be influenced by the JIT execution. A way to alleviate this problem is to
-**perform some warm-up runs before starting to measure**.
+**perform some warm-up runs before measuring**.
 
 ### Issues with Measuring Time
 
@@ -77,8 +77,8 @@ Some care has to be taken while measuring time with system utilities:
     resolution**.
 
 ### CPU speed
-  
-Many modern devices has CPU's that saves power by reducing the speed of the CPU
+
+Many modern devices have CPUs that save power by reducing the speed of the CPU
 and only increasing the speed when there is a need. For that reason it's also a
 good idea to warm-up the CPU.
 
@@ -95,6 +95,9 @@ attention is paid to some details:
    overhead that needs to be taken into consideration.
  * And of course always try to be fair in the comparison and actually compare
    apples to apples.
+ * Android will periodically check for updates, receive notifications, etc.
+   In order to minimize the influence of these external events, it is recommended
+   that you put the device in flight mode while benchmarking.
 
 
 ## Implicit or explicit transactions
@@ -105,7 +108,7 @@ course, when inserting, updating or removing rows or objects from either
 SQLite or Realm, explicit write transactions are used. The implicit read
 transactions are not directly measured.
 
-The `in.realm.internal` is also included in the benchmark under the name Realm
+The `io.realm.internal` is also included in the benchmark under the name Realm
 Low Level. This benchmark is used internally by Realm to measure the overhead
 of the object store. As `io.realm.internal` is using explicit read
 transactions, in some cases `io.realm.internal` will appear slower.
