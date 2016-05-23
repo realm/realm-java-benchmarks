@@ -180,7 +180,7 @@ subfolder named after the number of objects in the test, e.g "1000".
 You can validate the results by running the scripts as `tools/dsb.py -p -v`.
 Validation generates two different types of plots:
 
-1. Raw plots that output all measurement as a function of time/iteration. Java
+1. Raw plots that output all measurements as a function of time/iteration. Java
    can have strange spikes (due to JIT, GC, and implementation of
    `System.nanoTime()`). It also gives you an idea of the number of iterations 
    are correct. If measurements fluctuate to much, then you must increase the 
