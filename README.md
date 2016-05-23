@@ -3,7 +3,7 @@
 There are lies, damn lies and benchmarks. This is an attempt of the latter.
 
 Benchmarks are inherently difficult to make generic and really useful. We
-always recommend users to do their own benchmarks for the particular
+always recommend users to perform their own benchmarks for the particular
 use-cases that's important to them. So go do that - after reading below!
 
 Done properly, it can still be relatively useful as a rough indicator of areas
@@ -78,7 +78,7 @@ Some care has to be taken while measuring time with system utilities:
 
 ### CPU speed
 
-Many modern devices has CPU's that saves power by reducing the speed of the CPU
+Many modern devices have CPUs that save power by reducing the speed of the CPU
 and only increasing the speed when there is a need. For that reason it's also a
 good idea to warm-up the CPU.
 
