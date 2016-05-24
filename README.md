@@ -128,6 +128,7 @@ Run the benchmark the following way:
    in the UI when complete. Don't touch the phone while it is running.
 
        > ./gradlew installDebug
+       
        > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
 
 
