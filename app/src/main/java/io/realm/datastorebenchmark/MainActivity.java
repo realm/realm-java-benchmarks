@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     // effected either way.
     private static final String OUTPUT_FOLDER = "datastorebenchmark";
     private static final String TESTFILE_PREFIX = "datastore";
-    private static final long NUMBER_OF_ITERATIONS = 100;
-    private static final long NUMBER_OF_OBJECTS = 1000;
+    private static final long NUMBER_OF_ITERATIONS = 3;
+    private static final long NUMBER_OF_OBJECTS = 100000;
 
     private Handler handler = new Handler();
     private TextView statusView;
