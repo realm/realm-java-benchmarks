@@ -121,7 +121,7 @@ varied.
 
 Run the benchmark the following way:
 
-1. Set `NUMBER_OF_OBJECTS` in `app/src/main/java/io.realm.datastorebenchmark.MainActivity.java`.
+1. Set `NUMBER_OF_OBJECTS` in `app/src/main/java/io.realm.datastorebenchmark.Constants.java`.
    The rest of this guide assumes `1000`, which is also the default value.
 
 2. Deploy the app to the phone or emulator. It will auto-start and report *Done*
