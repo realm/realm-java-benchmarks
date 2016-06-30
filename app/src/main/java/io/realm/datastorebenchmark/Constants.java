@@ -19,7 +19,7 @@ public class Constants {
 //    public static final long NUMBER_OF_ITERATIONS = 25;
 //    public static final long NUMBER_OF_OBJECTS = 10000;
 
-    // Long test (15+ minutes)
+    // Long test (60+ minutes)
 //    public static final long NUMBER_OF_ITERATIONS = 5;
 //    public static final long NUMBER_OF_OBJECTS = 100000;
 }
