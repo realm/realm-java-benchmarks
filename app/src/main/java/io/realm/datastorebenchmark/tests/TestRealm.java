@@ -18,6 +18,8 @@ package io.realm.datastorebenchmark.tests;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -145,10 +147,22 @@ public class TestRealm extends DataStoreTest {
 
         Benchmark benchmark = new Benchmark() {
             private Realm realm;
+            private ArrayList<Employee> employees;
 
             @Override
             public void setUp() {
                 realm = Realm.getInstance(realmConfiguration);
+                employees = new ArrayList<Employee>((int)numberOfObjects);
+                Employee employee;
+                for (int i = 0; i < numberOfObjects; i++) {
+                    employee = new Employee();
+                    employee.setId(i);
+                    employee.setName(dataGenerator.getEmployeeName(i));
+                    employee.setHired(dataGenerator.getHiredBool(i));
+                    employee.setAge(dataGenerator.getEmployeeAge(i));
+
+                    employees.add(employee);
+                }
             }
 
             @Override
@@ -160,13 +174,7 @@ public class TestRealm extends DataStoreTest {
             @Override
             public void run() {
                 realm.beginTransaction();
-                for (int i = 0; i < numberOfObjects; i++) {
-                    Employee employee = realm.createObject(Employee.class);
-                    employee.setId(i);
-                    employee.setName(dataGenerator.getEmployeeName(i));
-                    employee.setHired(dataGenerator.getHiredBool(i));
-                    employee.setAge(dataGenerator.getEmployeeAge(i));
-                }
+                realm.insert(employees);
                 realm.commitTransaction();
             }
         };

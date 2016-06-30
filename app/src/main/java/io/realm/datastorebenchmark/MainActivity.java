@@ -25,7 +25,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
@@ -42,19 +41,12 @@ import io.realm.datastorebenchmark.tests.TestOrmLite;
 import io.realm.datastorebenchmark.tests.TestRealm;
 import io.realm.datastorebenchmark.tests.TestSQLite;
 
+import static io.realm.datastorebenchmark.Constants.*;
+
 
 public class MainActivity extends AppCompatActivity {
 
     final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
-
-    // Benchmark configuration
-    // Number of iterations should be high enough to include any warmup period. The worst outliers
-    // will be filtered out by only plotting the interquartile range and the median will not be
-    // effected either way.
-    private static final String OUTPUT_FOLDER = "datastorebenchmark";
-    private static final String TESTFILE_PREFIX = "datastore";
-    private static final long NUMBER_OF_ITERATIONS = 100;
-    private static final long NUMBER_OF_OBJECTS = 1000;
 
     private Handler handler = new Handler();
     private TextView statusView;
