@@ -2,12 +2,13 @@ package io.realm.datastorebenchmark.tests;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+
+import org.greenrobot.greendao.database.Database;
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.dao.query.QueryBuilder;
 import io.realm.datastorebenchmark.Benchmark;
 import io.realm.datastorebenchmark.DataStoreTest;
 import io.realm.datastorebenchmark.greendao.DaoMaster;
@@ -19,7 +20,7 @@ public class TestGreenDao extends DataStoreTest {
 
     private long numberOfIterations;
 
-    private SQLiteDatabase db;
+    private Database db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private EmployeeDao employeeDao;
@@ -70,7 +71,7 @@ public class TestGreenDao extends DataStoreTest {
     }
     public void setUp() {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "EmployeeGreenDAO.db", null);
-        db = helper.getWritableDatabase();
+        db = helper.getWritableDb();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         employeeDao = daoSession.getEmployeeDao();

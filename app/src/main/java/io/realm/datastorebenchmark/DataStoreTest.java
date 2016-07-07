@@ -47,7 +47,7 @@ public abstract class DataStoreTest {
 
     private String keys[] = { TEST_BATCH_WRITE, TEST_SIMPLE_WRITE, TEST_SIMPLE_QUERY,
             TEST_FULL_SCAN, TEST_COUNT, TEST_SUM, TEST_DELETE };
-    
+
     public DataStoreTest(Context context, long numberOfObjects) {
         Log.i("DataStoreBenchmark", this.getClass().getName().toString());
         this.context = context;
