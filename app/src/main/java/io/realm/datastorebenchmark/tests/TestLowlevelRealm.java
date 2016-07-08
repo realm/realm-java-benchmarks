@@ -32,11 +32,9 @@ import io.realm.internal.WriteTransaction;
 
 public class TestLowlevelRealm extends DataStoreTest {
     private String TABLE_NAME = "dummy";
-    private long numberOfIterations;
 
-    public TestLowlevelRealm(Context context, long numberOfObjects, long numberOfIterations) {
-        super(context, numberOfObjects);
-        this.numberOfIterations = numberOfIterations;
+    public TestLowlevelRealm(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
+        super(context, numberOfObjects, warmupIterations, testIterations);
     }
 
     private SharedGroup addTable() {
@@ -109,7 +107,7 @@ public class TestLowlevelRealm extends DataStoreTest {
                 i++;
             }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
 
     }
 
@@ -145,7 +143,7 @@ public class TestLowlevelRealm extends DataStoreTest {
                 readTransaction.endRead();
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
     }
 
     @Override
@@ -176,8 +174,17 @@ public class TestLowlevelRealm extends DataStoreTest {
                 }
                 writeTransaction.commit();
             }
+
+            @Override
+            protected void cleanupRun() {
+                WriteTransaction writeTransaction = sharedGroup.beginWrite();
+                Table table = writeTransaction.getTable(TABLE_NAME);
+                table.clear();
+                writeTransaction.commit();
+
+            }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
     }
 
     @Override
@@ -210,7 +217,7 @@ public class TestLowlevelRealm extends DataStoreTest {
                 readTransaction.endRead();
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
     }
 
     @Override
@@ -223,13 +230,16 @@ public class TestLowlevelRealm extends DataStoreTest {
             @Override
             public void setUp() {
                 sharedGroup = addTable();
-                addRows(sharedGroup);
-                verify(sharedGroup);
             }
 
             @Override
             public void tearDown() {
                 sharedGroup.close();
+            }
+
+            @Override
+            protected void prepareRun() {
+                addRows(sharedGroup);
             }
 
             @Override
@@ -239,7 +249,7 @@ public class TestLowlevelRealm extends DataStoreTest {
                 writeTransaction.commit();
             }
         };
-        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_DELETE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -269,7 +279,7 @@ public class TestLowlevelRealm extends DataStoreTest {
                 readTransaction.endRead();
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
     }
 
     @Override
@@ -297,7 +307,7 @@ public class TestLowlevelRealm extends DataStoreTest {
                 readTransaction.endRead();
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
     }
 
     @Override

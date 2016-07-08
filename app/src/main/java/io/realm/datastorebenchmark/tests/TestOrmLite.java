@@ -35,12 +35,10 @@ import io.realm.datastorebenchmark.ormlite.Employee;
 
 public class TestOrmLite extends DataStoreTest {
 
-    private long numberOfIterations;
     private DataBaseHelper dbHelper;
 
-    public TestOrmLite(Context context, long numberOfObjects, long numberOfIterations) {
-        super(context, numberOfObjects);
-        this.numberOfIterations = numberOfIterations;
+    public TestOrmLite(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
+        super(context, numberOfObjects, warmupIterations, testIterations);
     }
 
     @Override
@@ -81,7 +79,7 @@ public class TestOrmLite extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                deleteObjects();
+                // Do nothing
             }
 
             @Override
@@ -97,8 +95,13 @@ public class TestOrmLite extends DataStoreTest {
                     throw new RuntimeException(e);
                 }
             }
+
+            @Override
+            protected void cleanupRun() {
+                deleteObjects();
+            }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
         tearDown();
     }
 
@@ -138,7 +141,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
         tearDown();
     }
 
@@ -155,7 +158,7 @@ public class TestOrmLite extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                deleteObjects();
+                // Do nothing
             }
 
             @Override
@@ -179,8 +182,13 @@ public class TestOrmLite extends DataStoreTest {
                     throw new RuntimeException(e);
                 }
             }
+
+            @Override
+            protected void cleanupRun() {
+                deleteObjects();
+            }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
         tearDown();
     }
 
@@ -217,7 +225,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
         tearDown();
     }
 
@@ -227,13 +235,17 @@ public class TestOrmLite extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                addObjects();
-                verify();
+                // Do nothing
             }
 
             @Override
             public void tearDown() {
-                deleteObjects();
+                // Do nothing
+            }
+
+            @Override
+            protected void prepareRun() {
+                addObjects();
             }
 
             @Override
@@ -245,7 +257,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_DELETE, benchmark.execute(warmupIterations, testIterations));
         tearDown();
     }
 
@@ -275,7 +287,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
         tearDown();
     }
 
@@ -303,7 +315,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
         tearDown();
     }
 
@@ -345,7 +357,7 @@ public class TestOrmLite extends DataStoreTest {
     private void deleteObjects() {
         ConnectionSource connectionSource = dbHelper.getConnectionSource();
         try {
-            TableUtils.dropTable(connectionSource, Employee.class, true);
+            TableUtils.clearTable(connectionSource, Employee.class);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

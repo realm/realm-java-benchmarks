@@ -12,6 +12,7 @@ public class Constants {
     // effected either way.
 
     // Light test (2+ minutes) - default
+    public static final long WARMUP_ITERATIONS = 2;
     public static final long NUMBER_OF_ITERATIONS = 100;
     public static final long NUMBER_OF_OBJECTS = 1000;
 
