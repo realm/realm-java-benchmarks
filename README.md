@@ -210,8 +210,8 @@ http://www.purplemath.com/modules/boxwhisk.htm.
 The benchmark results were created using the setup described here: [TEST_SETUP](results/TEST_SETUP).
 
 ![Batch Write](results/benchmark_BatchWrite.png)
-![Simple Write](/results/benchmark_SimpleWrite.png)
-![Simple Query](/results/benchmark_SimpleQuery.png)
-![Full Scan - No Results](/results/benchmark_FullScan.png)
-![Count](/results/benchmark_Count.png)
-![Delete](/results/benchmark_Delete.png)
+![Simple Write](results/benchmark_SimpleWrite.png)
+![Simple Query](results/benchmark_SimpleQuery.png)
+![Full Scan - No Results](results/benchmark_FullScan.png)
+![Count](results/benchmark_Count.png)
+![Delete](results/benchmark_Delete.png)
