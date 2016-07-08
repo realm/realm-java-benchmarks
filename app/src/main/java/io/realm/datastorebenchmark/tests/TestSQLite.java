@@ -28,11 +28,9 @@ import io.realm.datastorebenchmark.entities.SQLiteDatabaseHelper;
 public class TestSQLite extends DataStoreTest {
     protected SQLiteDatabase db;
     private SQLiteDatabaseHelper dbHelper;
-    private long numberOfIterations;
 
-    public TestSQLite(Context context, long numberOfObjects, long numberOfIterations) {
-        super(context, numberOfObjects);
-        this.numberOfIterations = numberOfIterations;
+    public TestSQLite(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
+        super(context, numberOfObjects, warmupIterations, testIterations);
     }
 
     protected void setUp() {
@@ -119,7 +117,7 @@ public class TestSQLite extends DataStoreTest {
                 cursor.close();
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -141,7 +139,8 @@ public class TestSQLite extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                deleteRows();
+                // Do nothing
+
             }
 
             @Override
@@ -156,8 +155,13 @@ public class TestSQLite extends DataStoreTest {
                 db.endTransaction();
                 i++;
             }
+
+            @Override
+            protected void cleanupRun() {
+                deleteRows();
+            }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -174,15 +178,20 @@ public class TestSQLite extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                deleteRows();
+                // Do nothing
             }
 
             @Override
             public void run() {
                 addRows();
             }
+
+            @Override
+            protected void cleanupRun() {
+                deleteRows();
+            }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -212,7 +221,7 @@ public class TestSQLite extends DataStoreTest {
                 cursor.close();
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -227,12 +236,17 @@ public class TestSQLite extends DataStoreTest {
 
             @Override
             public void setUp() {
-                addRows();
+                // Do nothing
             }
 
             @Override
             public void tearDown() {
-                deleteRows();
+                // Do nothing
+            }
+
+            @Override
+            protected void prepareRun() {
+                addRows();
             }
 
             @Override
@@ -243,7 +257,7 @@ public class TestSQLite extends DataStoreTest {
                 db.endTransaction();
             }
         };
-        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_DELETE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -273,7 +287,7 @@ public class TestSQLite extends DataStoreTest {
                 cursor.close();
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -303,7 +317,7 @@ public class TestSQLite extends DataStoreTest {
                 cursor.close();
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }

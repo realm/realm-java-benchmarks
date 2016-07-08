@@ -138,11 +138,11 @@ public class MainActivity extends AppCompatActivity {
         // Configure which tests to run
         Context context = getApplicationContext();
         final List<DataStoreTest> tests = Arrays.asList(
-                new TestSQLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS), // Required for Speedup graphs
-                new TestRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-                new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-                new TestOrmLite(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS),
-                new TestGreenDao(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
+                new TestSQLite(context, NUMBER_OF_OBJECTS, WARMUP_ITERATIONS, NUMBER_OF_ITERATIONS), // Required for Speedup graphs
+                new TestRealm(context, NUMBER_OF_OBJECTS, WARMUP_ITERATIONS, NUMBER_OF_ITERATIONS),
+                new TestLowlevelRealm(context, NUMBER_OF_OBJECTS, WARMUP_ITERATIONS, NUMBER_OF_ITERATIONS),
+                new TestOrmLite(context, NUMBER_OF_OBJECTS, WARMUP_ITERATIONS, NUMBER_OF_ITERATIONS),
+                new TestGreenDao(context, NUMBER_OF_OBJECTS, WARMUP_ITERATIONS, NUMBER_OF_ITERATIONS)
                 // new TestCouch(context, NUMBER_OF_OBJECTS, NUMBER_OF_ITERATIONS)
         );
 

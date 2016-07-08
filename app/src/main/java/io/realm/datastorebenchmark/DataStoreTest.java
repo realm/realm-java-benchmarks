@@ -33,7 +33,9 @@ import java.util.Map;
 public abstract class DataStoreTest {
     protected Context context;
     protected Map<String, List<Long>> measurements;
-    protected long numberOfObjects;
+    protected final long numberOfObjects;
+    protected final long warmupIterations;
+    protected final long testIterations;
 
     protected DataGenerator dataGenerator;
 
@@ -48,11 +50,13 @@ public abstract class DataStoreTest {
     private String keys[] = { TEST_BATCH_WRITE, TEST_SIMPLE_WRITE, TEST_SIMPLE_QUERY,
             TEST_FULL_SCAN, TEST_COUNT, TEST_SUM, TEST_DELETE };
 
-    public DataStoreTest(Context context, long numberOfObjects) {
+    public DataStoreTest(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
         Log.i("DataStoreBenchmark", this.getClass().getName().toString());
         this.context = context;
         this.measurements = new HashMap<>();
         this.numberOfObjects = numberOfObjects;
+        this.warmupIterations = warmupIterations;
+        this.testIterations = testIterations;
         dataGenerator = new DataGenerator();
         dataGenerator.initNames();
     }
@@ -73,7 +77,7 @@ public abstract class DataStoreTest {
                     Log.i("DataStoreBenchmark", "invoking " + getTag() + ":" + method.getName());
                     method.invoke(this);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         }

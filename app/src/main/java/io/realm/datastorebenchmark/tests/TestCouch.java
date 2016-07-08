@@ -41,16 +41,12 @@ import io.realm.datastorebenchmark.DataStoreTest;
 
 public class TestCouch extends DataStoreTest {
 
-    private long numberOfIterations;
-
     private Database database;
     private Manager manager;
 
-    public TestCouch(Context context, long numberOfObjects, long numberOfIterations) {
-        super(context, numberOfObjects);
-        this.numberOfIterations = numberOfIterations;
+    public TestCouch(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
+        super(context, numberOfObjects, warmupIterations, testIterations);
     }
-
 
     private void addObjects() {
         for (int row = 0; row < numberOfObjects; row++) {
@@ -162,7 +158,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -215,7 +211,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -258,7 +254,7 @@ public class TestCouch extends DataStoreTest {
                 });
             }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -295,7 +291,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -322,7 +318,7 @@ public class TestCouch extends DataStoreTest {
                 int tmp = database.getDocumentCount();
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -369,7 +365,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }

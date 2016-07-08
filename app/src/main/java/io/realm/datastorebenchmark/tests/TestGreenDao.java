@@ -18,17 +18,13 @@ import io.realm.datastorebenchmark.greendao.EmployeeDao;
 
 public class TestGreenDao extends DataStoreTest {
 
-    private long numberOfIterations;
-
     private Database db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private EmployeeDao employeeDao;
 
-
-    public TestGreenDao(Context context, long numberOfObjects, long numberOfIterations) {
-        super(context, numberOfObjects);
-        this.numberOfIterations = numberOfIterations;
+    public TestGreenDao(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
+        super(context, numberOfObjects, warmupIterations, testIterations);
     }
 
     private void addObjects() {
@@ -49,7 +45,7 @@ public class TestGreenDao extends DataStoreTest {
         }
     }
 
-    private void delete() {
+    private void deleteObjects() {
         try {
             db.beginTransaction();
             employeeDao.deleteAll();
@@ -97,7 +93,7 @@ public class TestGreenDao extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                delete();
+                // Do nothing
             }
 
             @Override
@@ -108,8 +104,13 @@ public class TestGreenDao extends DataStoreTest {
                 employee.setHired(dataGenerator.getHiredBool(index));
                 employeeDao.insert(employee);
             }
+
+            @Override
+            protected void cleanupRun() {
+                deleteObjects();
+            }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -127,7 +128,7 @@ public class TestGreenDao extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                delete();
+                deleteObjects();
             }
 
             @Override
@@ -144,7 +145,7 @@ public class TestGreenDao extends DataStoreTest {
 
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -156,11 +157,12 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
+                // Do nothing
             }
 
             @Override
             public void tearDown() {
-                delete();
+                // Do nothing
             }
 
             @Override
@@ -175,8 +177,13 @@ public class TestGreenDao extends DataStoreTest {
                 }
                 employeeDao.insertInTx(data);
             }
+
+            @Override
+            protected void cleanupRun() {
+                deleteObjects();
+            }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -194,7 +201,7 @@ public class TestGreenDao extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                delete();
+                deleteObjects();
             }
 
             @Override
@@ -208,7 +215,7 @@ public class TestGreenDao extends DataStoreTest {
                 int count = list.size();
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -220,12 +227,17 @@ public class TestGreenDao extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                addObjects();
+                // Do nothing
             }
 
             @Override
             public void tearDown() {
-                delete();
+                // Do nothing
+            }
+
+            @Override
+            protected void prepareRun() {
+                addObjects();
             }
 
             @Override
@@ -241,7 +253,7 @@ public class TestGreenDao extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_DELETE, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_DELETE, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -259,7 +271,7 @@ public class TestGreenDao extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                delete();
+                deleteObjects();
             }
 
             @Override
@@ -274,7 +286,7 @@ public class TestGreenDao extends DataStoreTest {
                 cursor.close();
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
@@ -292,7 +304,7 @@ public class TestGreenDao extends DataStoreTest {
 
             @Override
             public void tearDown() {
-                delete();
+                deleteObjects();
             }
 
             @Override
@@ -300,7 +312,7 @@ public class TestGreenDao extends DataStoreTest {
                 long count = employeeDao.count();
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(numberOfIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
 
         tearDown();
     }
