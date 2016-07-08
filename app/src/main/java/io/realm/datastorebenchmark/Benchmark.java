@@ -64,15 +64,15 @@ public abstract class Benchmark {
         setUp();
 
         for (int i = 0; i < warmupIterations; i++) {
-            System.gc();
             prepareRun();
+            System.gc();
             run();
             cleanupRun();
         }
 
         for (int i = 0; i < numberOfIterations; i++) {
-            System.gc();
             prepareRun();
+            System.gc();
             startTimer();
             run();
             stopTimer();
