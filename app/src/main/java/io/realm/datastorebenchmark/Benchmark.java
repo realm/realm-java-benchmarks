@@ -31,12 +31,13 @@ public abstract class Benchmark {
     }
 
     /**
-     * Setting up the benchmark
+     * Setting up the benchmark. This method will only be called once before all the warmup/test iterations.
      */
     public abstract void setUp();
 
     /**
-     * Tear down any structures used by the benchmark
+     * Tear down any structures used by the benchmark. This method will only be called once all warmup/test iterations
+     * are completed.
      */
     public abstract void tearDown();
 
@@ -46,34 +47,53 @@ public abstract class Benchmark {
     public abstract void run();
 
     /**
-     * Execute the microbenchmark
+     * Initialize any data used by a single benchmark run.
      */
-    public List<Long> execute(long numberOfIterations) {
+    protected void prepareRun() {
+
+    }
+
+    /**
+     * Cleanup any temporary data created during a single run of the benchmark, e.g inserted objects can be removed.
+     */
+    protected void cleanupRun() {
+
+    }
+
+    public List<Long> execute(long warmupIterations, long numberOfIterations) {
         setUp();
+
+        for (int i = 0; i < warmupIterations; i++) {
+            System.gc();
+            prepareRun();
+            run();
+            cleanupRun();
+        }
 
         for (int i = 0; i < numberOfIterations; i++) {
             System.gc();
-            start();
+            prepareRun();
+            startTimer();
             run();
-            stop();
+            stopTimer();
+            cleanupRun();
         }
 
         tearDown();
-
         return timings;
     }
 
     /**
      * Starts the timer
      */
-    public void start() {
+    public void startTimer() {
         timeStart = Debug.threadCpuTimeNanos();
     }
 
     /**
      * Stops the timer
      */
-    public void stop() {
+    public void stopTimer() {
         long timeStop = Debug.threadCpuTimeNanos();
         long duration = timeStop - timeStart; // may report 0
         timings.add(duration);
