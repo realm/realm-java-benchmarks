@@ -16,11 +16,13 @@ public class Constants {
     public static final long NUMBER_OF_ITERATIONS = 100;
     public static final long NUMBER_OF_OBJECTS = 1000;
 
-    // Medium test (7+ minutes)
-//    public static final long NUMBER_OF_ITERATIONS = 25;
+    // Medium test (5+ minutes) - default
+//    public static final long WARMUP_ITERATIONS = 2;
+//    public static final long NUMBER_OF_ITERATIONS = 50;
 //    public static final long NUMBER_OF_OBJECTS = 10000;
 
-    // Long test (60+ minutes)
-//    public static final long NUMBER_OF_ITERATIONS = 5;
+    // Long test (15+ minutes)
+//    public static final long WARMUP_ITERATIONS = 2;
+//    public static final long NUMBER_OF_ITERATIONS = 15;
 //    public static final long NUMBER_OF_OBJECTS = 100000;
 }

@@ -204,3 +204,14 @@ different benchmark tasks. You find the graphs as `benchmark_<TEST>.png`. The
 output is a box-and-whisker plot using an IQR of 1.5 and with hidden outliers.
 For more information about how to interpret a box plot, read
 http://www.purplemath.com/modules/boxwhisk.htm.
+
+## Results
+
+The benchmark results were created using the setup described here: [TEST_SETUP](results/TEST_SETUP).
+
+![Batch Write](results/benchmark_BatchWrite.png)
+![Simple Write](/results/benchmark_SimpleWrite.png)
+![Simple Query](/results/benchmark_SimpleQuery.png)
+![Full Scan - No Results](/results/benchmark_FullScan.png)
+![Count](/results/benchmark_Count.png)
+![Delete](/results/benchmark_Delete.png)

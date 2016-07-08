@@ -17,6 +17,8 @@
 package io.realm.datastorebenchmark.tests;
 
 import android.content.Context;
+import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.GenericRawResults;
@@ -36,6 +38,7 @@ import io.realm.datastorebenchmark.ormlite.Employee;
 public class TestOrmLite extends DataStoreTest {
 
     private DataBaseHelper dbHelper;
+    private ConnectionSource connectionSource;
 
     public TestOrmLite(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
         super(context, numberOfObjects, warmupIterations, testIterations);
@@ -46,10 +49,9 @@ public class TestOrmLite extends DataStoreTest {
         super.setUp();
         DataBaseHelper.init(context, false);
         dbHelper = DataBaseHelper.getInstance();
-        ConnectionSource connectionSource = dbHelper.getConnectionSource();
+        connectionSource = dbHelper.getConnectionSource();
         try {
-            TableUtils.dropTable(connectionSource, Employee.class, true);
-            TableUtils.createTable(connectionSource, Employee.class);
+            TableUtils.createTableIfNotExists(connectionSource, Employee.class);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -57,13 +59,11 @@ public class TestOrmLite extends DataStoreTest {
 
     @Override
     protected void tearDown() {
-        ConnectionSource connectionSource = dbHelper.getConnectionSource();
         try {
             TableUtils.dropTable(connectionSource, Employee.class, true);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        super.tearDown();
     }
 
     @Override
@@ -113,7 +113,6 @@ public class TestOrmLite extends DataStoreTest {
             @Override
             public void setUp() {
                 addObjects();
-                verify();
             }
 
             @Override
@@ -149,11 +148,9 @@ public class TestOrmLite extends DataStoreTest {
     public void testBatchWrite() {
         setUp();
         Benchmark benchmark = new Benchmark() {
-            public ConnectionSource connectionSource;
-
             @Override
             public void setUp() {
-                connectionSource = dbHelper.getConnectionSource();
+                // Do nothing
             }
 
             @Override
@@ -164,10 +161,10 @@ public class TestOrmLite extends DataStoreTest {
             @Override
             public void run() {
                 try {
-                    TransactionManager.callInTransaction(connectionSource, new Callable<Void>() {
+                    final Dao<Employee, Long> dao = Employee.getDao();
+                    dao.callBatchTasks(new Callable<Object>() {
                         @Override
-                        public Void call() throws Exception {
-                            Dao<Employee, Long> dao = Employee.getDao();
+                        public Object call() throws Exception {
                             for (int i = 0; i < numberOfObjects; i++) {
                                 Employee employee = new Employee();
                                 employee.setName(dataGenerator.getEmployeeName(i));
@@ -178,7 +175,7 @@ public class TestOrmLite extends DataStoreTest {
                             return null;
                         }
                     });
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -200,7 +197,6 @@ public class TestOrmLite extends DataStoreTest {
             @Override
             public void setUp() {
                 addObjects();
-                verify();
             }
 
             @Override
@@ -268,7 +264,6 @@ public class TestOrmLite extends DataStoreTest {
             @Override
             public void setUp() {
                 addObjects();
-                verify();
             }
 
             @Override
@@ -298,7 +293,6 @@ public class TestOrmLite extends DataStoreTest {
             @Override
             public void setUp() {
                 addObjects();
-                verify();
             }
 
             @Override
@@ -327,28 +321,21 @@ public class TestOrmLite extends DataStoreTest {
     // Helper method for filling the DB
     private void addObjects() {
         try {
-            for (int i = 0; i < numberOfObjects; i++) {
-                Employee employee = new Employee();
-                employee.setName(dataGenerator.getEmployeeName(i));
-                employee.setAge(dataGenerator.getEmployeeAge(i));
-                employee.setHired(dataGenerator.getHiredBool(i));
-                Employee.getDao().create(employee);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Check that addObjects() did it job
-    private void verify() {
-        List<Employee> employees;
-        try {
-            employees = Employee.getDao().queryForAll();
-            if (employees.size() != numberOfObjects) {
-                throw new RuntimeException(String.format("Number of objects is %d - %d expected.",
-                        employees.size(), numberOfObjects));
-            }
-        } catch (SQLException e) {
+            final Dao<Employee, Long> dao = Employee.getDao();
+            dao.callBatchTasks(new Callable<Object>() {
+                @Override
+                public Object call() throws Exception {
+                    for (int i = 0; i < numberOfObjects; i++) {
+                        Employee employee = new Employee();
+                        employee.setName(dataGenerator.getEmployeeName(i));
+                        employee.setHired(dataGenerator.getHiredBool(i));
+                        employee.setAge(dataGenerator.getEmployeeAge(i));
+                        dao.create(employee);
+                    }
+                    return null;
+                }
+            });
+       } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
