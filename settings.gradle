@@ -1,1 +1,1 @@
-include ':app', ':greendaoGenerator'
+include ':app'
