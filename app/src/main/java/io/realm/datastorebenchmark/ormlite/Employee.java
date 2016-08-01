@@ -85,7 +85,7 @@ public class Employee {
             try {
                 sDao = DataBaseHelper.getInstance().getDao(Employee.class);
             } catch (SQLException e) {
-                return null;
+                throw new RuntimeException(e);
             }
         }
         return sDao;
