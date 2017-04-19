@@ -33,7 +33,8 @@ public class TestRealm extends DataStoreTest {
 
     public TestRealm(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
         super(context, numberOfObjects, warmupIterations, testIterations);
-        this.realmConfiguration = new RealmConfiguration.Builder(context).build();
+        Realm.init(context);
+        this.realmConfiguration = new RealmConfiguration.Builder().build();
     }
 
     public void setUp() {
