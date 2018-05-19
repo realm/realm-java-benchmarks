@@ -68,6 +68,16 @@ public abstract class DataStoreTest {
     }
 
     public void allTests() {
+        testSimpleWrite();
+        testSimpleQuery();
+        testBatchWrite();
+        testFullScan();
+        testDelete();
+        testSum();
+        testCount();
+    }
+
+    public void allTestsAuto() {
         Class clazz = this.getClass();
         Method[] methods = clazz.getMethods();
         for (Method method : methods) {
