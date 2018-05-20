@@ -51,7 +51,7 @@ public abstract class DataStoreTest {
             TEST_FULL_SCAN, TEST_COUNT, TEST_SUM, TEST_DELETE };
 
     public DataStoreTest(Context context, long numberOfObjects, long warmupIterations, long testIterations) {
-        Log.i("DataStoreBenchmark", this.getClass().getName().toString());
+        Log.i("DataStoreBenchmark", this.getClass().getName());
         this.context = context;
         this.measurements = new HashMap<>();
         this.numberOfObjects = numberOfObjects;
@@ -77,6 +77,9 @@ public abstract class DataStoreTest {
         testCount();
     }
 
+    /*
+    // Automatically discover test methods
+    
     public void allTestsAuto() {
         Class clazz = this.getClass();
         Method[] methods = clazz.getMethods();
@@ -92,6 +95,7 @@ public abstract class DataStoreTest {
             }
         }
     }
+    */
 
     public void saveHeader(String filePrefix) {
         try {
