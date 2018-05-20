@@ -32,6 +32,8 @@ import com.couchbase.lite.View;
 import com.couchbase.lite.android.AndroidContext;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -373,6 +375,9 @@ public class TestCouch extends DataStoreTest {
     @Override
     public void testDelete() {
         // TODO Implement this test
+
+        // Add dummy test value
+        measurements.put(TEST_DELETE, new ArrayList<Long>(Arrays.asList(1L,1L)));
     }
 
     @Override
