@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.io.File;
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         checkCpuTimeNanos();
 
         // Create folder used to store benchmark results.
-        File outputFolder = createOutputDirectory();
+        final File outputFolder = createOutputDirectory();
 
         // resolution/granularity of timer
         measureTimerResolution(outputFolder);
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 boolean first = true;
                 for (DataStoreTest test : tests) {
+                    Log.i("Progress", test.getClass().getName() );
                     test.allTests();
                     if (first) {
                         test.saveHeader(TESTFILE_PREFIX);
@@ -159,7 +161,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     test.saveMeasurements(TESTFILE_PREFIX);
                 }
-                statusView.setText("Done");
+                statusView.setText("All benchmarks done. Results in " + outputFolder.getAbsolutePath());
+                Log.i("Progress","Testing Done ");
             }
         }, 800);
     }
