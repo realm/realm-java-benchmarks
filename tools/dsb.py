@@ -160,6 +160,7 @@ def plot_speedup(datasize):
     for test in TESTS:
         (_, timings) = read_values(datasize, 'sqlite', test)
         sqlite = np.median(timings)
+        print
         for store in dstores:
             (_, values) = read_values(datasize, store, test)
             speedup = 0
@@ -174,7 +175,7 @@ def plot_speedup(datasize):
                 testdata[store] = {"data": []}
 
             testdata[store]['data'].append(speedup)
-            print 'datastore = ', store, ' test = ', test, ' speedup = ', speedup
+            print 'datastore = ', store, '\t test = ', test, '\t speedup = ', speedup
 
 
     # Plot all data: Group each datastore for each benchmark
