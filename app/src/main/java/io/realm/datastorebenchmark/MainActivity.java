@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 boolean first = true;
                 for (DataStoreTest test : tests) {
-                    Log.i("Progress", test.getClass().getName() );
+                    Log.i(test.getClass().getName(), "Starting..."  );
                     test.allTests();
                     if (first) {
                         test.saveHeader(TESTFILE_PREFIX);
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                     test.saveMeasurements(TESTFILE_PREFIX);
                 }
                 statusView.setText("All benchmarks done. Results in " + outputFolder.getAbsolutePath());
-                Log.i("Progress","Testing Done ");
+                Log.i(test.getClass().getName(), "Testing Done.");
             }
         }, 800);
     }

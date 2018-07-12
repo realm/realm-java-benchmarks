@@ -42,6 +42,10 @@ public class TestRealm extends DataStoreTest {
         Realm.deleteRealm(realmConfiguration);
     }
 
+    public void tearDown() {
+        super.tearDown();
+    }
+
     private void addObjects(Realm realm) {
         realm.beginTransaction();
         for (int i = 0; i < numberOfObjects; i++) {
@@ -99,7 +103,7 @@ public class TestRealm extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(TEST_SIMPLE_QUERY, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -140,7 +144,8 @@ public class TestRealm extends DataStoreTest {
                 deleteObjects(realm);
             }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(TEST_SIMPLE_WRITE, warmupIterations, testIterations));
+
         tearDown();
     }
 
@@ -185,7 +190,7 @@ public class TestRealm extends DataStoreTest {
                 realm.close();
             }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(TEST_BATCH_WRITE, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -219,7 +224,7 @@ public class TestRealm extends DataStoreTest {
                 long count = realmResults.size();
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(TEST_FULL_SCAN, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -254,7 +259,7 @@ public class TestRealm extends DataStoreTest {
             }
 
         };
-        measurements.put(TEST_DELETE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_DELETE, benchmark.execute(TEST_DELETE, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -284,7 +289,7 @@ public class TestRealm extends DataStoreTest {
                 long sum = realm.where(Employee.class).sum("age").longValue();
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SUM, benchmark.execute(TEST_SUM, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -314,7 +319,7 @@ public class TestRealm extends DataStoreTest {
                 long count = realm.where(Employee.class).count();
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(TEST_COUNT, warmupIterations, testIterations));
 
         tearDown();
     }

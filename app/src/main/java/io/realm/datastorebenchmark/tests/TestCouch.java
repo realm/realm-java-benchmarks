@@ -93,6 +93,8 @@ public class TestCouch extends DataStoreTest {
     }
 
     public void setUp() {
+        super.setUp();
+
         try {
             manager = new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS);
         } catch (IOException e) {
@@ -112,6 +114,8 @@ public class TestCouch extends DataStoreTest {
     }
 
     public void tearDown() {
+        super.tearDown();
+
         try {
             database.delete();
         } catch (CouchbaseLiteException e) {
@@ -160,7 +164,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(TEST_SIMPLE_WRITE, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -213,7 +217,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(TEST_SIMPLE_QUERY, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -256,7 +260,7 @@ public class TestCouch extends DataStoreTest {
                 });
             }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(TEST_BATCH_WRITE, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -293,7 +297,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SUM, benchmark.execute(TEST_SUM, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -320,7 +324,7 @@ public class TestCouch extends DataStoreTest {
                 int tmp = database.getDocumentCount();
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(TEST_COUNT, warmupIterations, testIterations));
 
         tearDown();
     }
@@ -367,7 +371,7 @@ public class TestCouch extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(TEST_FULL_SCAN, warmupIterations, testIterations));
 
         tearDown();
     }

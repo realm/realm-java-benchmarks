@@ -101,7 +101,7 @@ public class TestOrmLite extends DataStoreTest {
                 deleteObjects();
             }
         };
-        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(TEST_SIMPLE_WRITE, warmupIterations, testIterations));
         tearDown();
     }
 
@@ -140,7 +140,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SIMPLE_QUERY, benchmark.execute(TEST_SIMPLE_QUERY, warmupIterations, testIterations));
         tearDown();
     }
 
@@ -185,7 +185,7 @@ public class TestOrmLite extends DataStoreTest {
                 deleteObjects();
             }
         };
-        measurements.put(TEST_BATCH_WRITE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_BATCH_WRITE, benchmark.execute(TEST_BATCH_WRITE, warmupIterations, testIterations));
         tearDown();
     }
 
@@ -221,7 +221,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_FULL_SCAN, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_FULL_SCAN, benchmark.execute(TEST_FULL_SCAN, warmupIterations, testIterations));
         tearDown();
     }
 
@@ -253,7 +253,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_DELETE, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_DELETE, benchmark.execute(TEST_DELETE, warmupIterations, testIterations));
         tearDown();
     }
 
@@ -282,7 +282,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_SUM, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_SUM, benchmark.execute(TEST_SUM, warmupIterations, testIterations));
         tearDown();
     }
 
@@ -309,7 +309,7 @@ public class TestOrmLite extends DataStoreTest {
                 }
             }
         };
-        measurements.put(TEST_COUNT, benchmark.execute(warmupIterations, testIterations));
+        measurements.put(TEST_COUNT, benchmark.execute(TEST_COUNT, warmupIterations, testIterations));
         tearDown();
     }
 

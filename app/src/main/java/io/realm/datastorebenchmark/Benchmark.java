@@ -17,6 +17,7 @@
 package io.realm.datastorebenchmark;
 
 import android.os.Debug;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,8 @@ public abstract class Benchmark {
 
     }
 
-    public List<Long> execute(long warmupIterations, long numberOfIterations) {
+    public List<Long> execute(String tag, long warmupIterations, long numberOfIterations) {
+        Log.i(tag, "Execute - Setup");
         setUp();
 
         for (int i = 0; i < warmupIterations; i++) {
@@ -80,6 +82,7 @@ public abstract class Benchmark {
         }
 
         tearDown();
+        Log.i(tag, "Execute - done---------- " + timings.toString());
         return timings;
     }
 
