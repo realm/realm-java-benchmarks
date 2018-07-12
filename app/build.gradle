@@ -30,7 +30,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
 
     compile 'com.j256.ormlite:ormlite-android:4.48' // ORMLite
-    compile 'com.couchbase.lite:couchbase-lite-android:1.1.0' // Couchlite
+    compile 'com.couchbase.lite:couchbase-lite-android:1.4.1' // Couchlite
     compile 'org.greenrobot:greendao:3.0.1' // GreenDAO
 
     // utility functions
