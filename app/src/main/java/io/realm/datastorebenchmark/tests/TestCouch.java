@@ -378,10 +378,34 @@ public class TestCouch extends DataStoreTest {
 
     @Override
     public void testDelete() {
-        // TODO Implement this test
+        setUp();
 
-        // Add dummy test value
-        measurements.put(TEST_DELETE, new ArrayList<Long>(Arrays.asList(1L,1L)));
+        Benchmark benchmark = new Benchmark() {
+
+            @Override
+            public void setUp() {
+            }
+
+            @Override
+            public void tearDown() {
+                delete();
+            }
+
+            @Override
+            protected void prepareRun() {
+                addObjects();
+                verify();
+            }
+
+            @Override
+            public void run() {
+                delete();
+            }
+
+        };
+        measurements.put(TEST_DELETE, benchmark.execute(TEST_DELETE, warmupIterations, testIterations));
+
+        tearDown();
     }
 
     @Override
