@@ -176,7 +176,6 @@ public class TestCouch extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }
@@ -229,7 +228,6 @@ public class TestCouch extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
             }
 
             @Override
@@ -272,7 +270,6 @@ public class TestCouch extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }
@@ -309,7 +306,6 @@ public class TestCouch extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }
@@ -336,7 +332,6 @@ public class TestCouch extends DataStoreTest {
         Benchmark benchmark = new Benchmark() {
             @Override
             public void setUp() {
-                delete();
                 addObjects();
                 verify();
             }
