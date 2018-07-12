@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                     test.saveMeasurements(TESTFILE_PREFIX);
                 }
                 statusView.setText("All benchmarks done. Results in " + outputFolder.getAbsolutePath());
-                Log.i(test.getClass().getName(), "Testing Done.");
+                Log.i(this.getClass().getName(), "Testing Done.");
             }
         }, 800);
     }
