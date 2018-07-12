@@ -130,9 +130,11 @@ public class TestCouch extends DataStoreTest {
         setUp();
 
         Benchmark benchmark = new Benchmark() {
+            private int i;
+
             @Override
             public void setUp() {
-                delete();
+                i = 0;
             }
 
             @Override
@@ -142,17 +144,15 @@ public class TestCouch extends DataStoreTest {
 
             @Override
             public void run() {
-                for (int i = 0; i < numberOfObjects; i++) {
-                    final int testRow = i;
                     database.runInTransaction(new TransactionalTask() {
                         @Override
                         public boolean run() {
                             Document document = database.createDocument();
                             Map<String, Object> docContent = new HashMap<String, Object>();
-                            docContent.put("id", testRow);
-                            docContent.put("name", dataGenerator.getEmployeeName(testRow));
-                            docContent.put("age", dataGenerator.getEmployeeAge(testRow));
-                            docContent.put("hired", dataGenerator.getHiredBool(testRow));
+                        docContent.put("id", i);
+                        docContent.put("name", dataGenerator.getEmployeeName(i));
+                        docContent.put("age", dataGenerator.getEmployeeAge(i));
+                        docContent.put("hired", dataGenerator.getHiredBool(i));
                             try {
                                 document.putProperties(docContent);
                             } catch (CouchbaseLiteException e) {
@@ -161,7 +161,7 @@ public class TestCouch extends DataStoreTest {
                             return true;
                         }
                     });
-                }
+                i++;
             }
         };
         measurements.put(TEST_SIMPLE_WRITE, benchmark.execute(TEST_SIMPLE_WRITE, warmupIterations, testIterations));
