@@ -32,8 +32,6 @@ import com.couchbase.lite.View;
 import com.couchbase.lite.android.AndroidContext;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -57,7 +55,7 @@ public class TestCouch extends DataStoreTest {
                 @Override
                 public boolean run() {
                     Document document = database.createDocument();
-                    Map<String, Object> docContent = new HashMap<String, Object>();
+                    Map<String, Object> docContent = new HashMap<>();
                     docContent.put("id", testRow);
                     docContent.put("name", dataGenerator.getEmployeeName(testRow));
                     docContent.put("age", dataGenerator.getEmployeeAge(testRow));
@@ -144,23 +142,23 @@ public class TestCouch extends DataStoreTest {
 
             @Override
             public void run() {
-                    database.runInTransaction(new TransactionalTask() {
-                        @Override
-                        public boolean run() {
-                            Document document = database.createDocument();
-                            Map<String, Object> docContent = new HashMap<String, Object>();
-                        docContent.put("id", i);
-                        docContent.put("name", dataGenerator.getEmployeeName(i));
-                        docContent.put("age", dataGenerator.getEmployeeAge(i));
-                        docContent.put("hired", dataGenerator.getHiredBool(i));
-                            try {
-                                document.putProperties(docContent);
-                            } catch (CouchbaseLiteException e) {
-                                throw new RuntimeException("Cannot save object.");
-                            }
-                            return true;
-                        }
-                    });
+                database.runInTransaction(new TransactionalTask() {
+                    @Override
+                    public boolean run() {
+                    Document document = database.createDocument();
+                    Map<String, Object> docContent = new HashMap<>();
+                    docContent.put("id", i);
+                    docContent.put("name", dataGenerator.getEmployeeName(i));
+                    docContent.put("age", dataGenerator.getEmployeeAge(i));
+                    docContent.put("hired", dataGenerator.getHiredBool(i));
+                    try {
+                        document.putProperties(docContent);
+                    } catch (CouchbaseLiteException e) {
+                        throw new RuntimeException("Cannot save object.");
+                    }
+                    return true;
+                }
+                });
                 i++;
             }
         };
@@ -193,17 +191,17 @@ public class TestCouch extends DataStoreTest {
                 view.setMap(new Mapper() {
                     @Override
                     public void map(Map<String, Object> document, Emitter emitter) {
-                        Object name   = document.get("name");
-                        Integer age   = (Integer)document.get("age");
-                        Boolean hired = (Boolean)document.get("hired");
-                        if (name.equals("Smile1") && (age >= -2 || age <= -1) && hired == false) {
-                            emitter.emit(document.get("id"), document);
-                        }
+                    Object name   = document.get("name");
+                    Integer age   = (Integer)document.get("age");
+                    Boolean hired = (Boolean)document.get("hired");
+                    if (name.equals("Smile1") && (age >= -2 || age <= -1) && !hired) {
+                        emitter.emit(document.get("id"), document);
                     }
+                }
                 }, "1.0");
 
                 Query query = view.createQuery();
-                QueryEnumerator en = null;
+                QueryEnumerator en;
                 try {
                     en = query.run();
                     while (en.hasNext()) {
@@ -240,20 +238,20 @@ public class TestCouch extends DataStoreTest {
                 database.runInTransaction(new TransactionalTask() {
                     @Override
                     public boolean run() {
-                        for (int i = 0; i < numberOfObjects; i++) {
-                            Document document = database.createDocument();
-                            Map<String, Object> docContent = new HashMap<String, Object>();
-                            docContent.put("id", i);
-                            docContent.put("name", dataGenerator.getEmployeeName(i));
-                            docContent.put("age", dataGenerator.getEmployeeAge(i));
-                            docContent.put("hired", dataGenerator.getHiredBool(i));
-                            try {
-                                document.putProperties(docContent);
-                            } catch (CouchbaseLiteException e) {
-                                throw new RuntimeException("Cannot save object.");
-                            }
+                    for (int i = 0; i < numberOfObjects; i++) {
+                        Document document = database.createDocument();
+                        Map<String, Object> docContent = new HashMap<>();
+                        docContent.put("id", i);
+                        docContent.put("name", dataGenerator.getEmployeeName(i));
+                        docContent.put("age", dataGenerator.getEmployeeAge(i));
+                        docContent.put("hired", dataGenerator.getHiredBool(i));
+                        try {
+                            document.putProperties(docContent);
+                        } catch (CouchbaseLiteException e) {
+                            throw new RuntimeException("Cannot save object.");
                         }
-                        return true;
+                    }
+                    return true;
                     }
                 });
             }
@@ -285,8 +283,8 @@ public class TestCouch extends DataStoreTest {
                 Query query = database.createAllDocumentsQuery();
                 try {
                     QueryEnumerator en = query.run();
-                    for (Iterator<QueryRow> it = en; it.hasNext(); ) {
-                        QueryRow row = it.next();
+                    for (; en.hasNext(); ) {
+                        QueryRow row = en.next();
                         age += ((Integer) row.getDocument().getProperty("age")).longValue();
                     }
                 } catch (CouchbaseLiteException e) {
@@ -304,6 +302,7 @@ public class TestCouch extends DataStoreTest {
         setUp();
 
         Benchmark benchmark = new Benchmark() {
+
             @Override
             public void setUp() {
                 addObjects();
@@ -348,19 +347,18 @@ public class TestCouch extends DataStoreTest {
                 view.setMap(new Mapper() {
                     @Override
                     public void map(Map<String, Object> document, Emitter emitter) {
-                        Object name   = document.get("name");
-                        Integer age   = (Integer)document.get("age");
-                        Boolean hired = (Boolean)document.get("hired");
-                        if (name.equals("Smile1") && (age >= -2 || age <= -1) && hired == false) {
-                            emitter.emit(document.get("id"), document);
-                        }
+                    Object name   = document.get("name");
+                    Integer age   = (Integer)document.get("age");
+                    Boolean hired = (Boolean)document.get("hired");
+                    if (name.equals("Smile1") && (age >= -2 || age <= -1) && !hired) {
+                        emitter.emit(document.get("id"), document);
+                    }
                     }
                 }, "1.0");
 
                 Query query = view.createQuery();
-                QueryEnumerator en;
                 try {
-                    en = query.run();
+                    query.run();
                 } catch (CouchbaseLiteException e) {
                     throw new RuntimeException("Cannot retrieve object.");
                 }

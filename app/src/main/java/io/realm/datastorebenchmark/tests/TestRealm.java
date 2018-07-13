@@ -68,7 +68,7 @@ public class TestRealm extends DataStoreTest {
 
     private void deleteObjects(Realm realm) {
         realm.beginTransaction();
-        realm.deleteAll();;
+        realm.deleteAll();
         realm.commitTransaction();
     }
 
@@ -160,7 +160,7 @@ public class TestRealm extends DataStoreTest {
             @Override
             public void setUp() {
                 realm = Realm.getInstance(realmConfiguration);
-                employees = new ArrayList<Employee>((int)numberOfObjects);
+                employees = new ArrayList<>((int) numberOfObjects);
                 Employee employee;
                 for (int i = 0; i < numberOfObjects; i++) {
                     employee = new Employee();

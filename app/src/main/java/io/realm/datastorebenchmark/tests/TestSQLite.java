@@ -230,9 +230,6 @@ public class TestSQLite extends DataStoreTest {
         setUp();
 
         Benchmark benchmark = new Benchmark() {
-            private SQLiteStatement stmt;
-            private int i;
-
             @Override
             public void setUp() {
                 // Do nothing
