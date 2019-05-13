@@ -3,11 +3,8 @@ import os
 import re
 import sys
 
-#
 # Read output from Android benchmarks and convert it to the output we used in our own benchmarks
-#
 # This script requires that the benchmark file is placed next to the script
-#
 with open('io.realm.benchmark.test-benchmarkData.json', 'r') as benchmarkResults:
     # parse file
     results = json.loads(benchmarkResults.read())

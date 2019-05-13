@@ -27,11 +27,10 @@ import matplotlib.pyplot as plt
 XKCD_STYLE = False
 
 # List of names of possible tested data stores (see DataStoreTest#getTag())
-# DATASTORES = ['sqlite', 'realm', 'room', 'couchbase']
 DATASTORES = ['sqlite', 'realm', 'room']
 # Number of objects tested. It is assumed that all sub folders contain test data and are named after
 # the number of objects tested, e.g "./1000" or "./10000".
-DATASIZES = ['1000']
+DATASIZES = ['10', '100', '1000']
 
 # The individual benchmarks (see TestDataStore.java)
 TESTS = ['batchWrite', 'simpleWrite', 'simpleQuery', 'fullScan', 'sum', 'count', 'delete']
@@ -77,7 +76,7 @@ def benchmark(datasize):
         plt.ylabel('Ops/sec')
         plt.boxplot(data, whis=1.5, sym='')
         plt.xticks(np.arange(1, len(labels) + 1), labels)
-
+        plt.ylim(ymin=0)
         out_file_name = str(datasize) + '/benchmark_' + test +'.png'
         plt.savefig(out_file_name)
         plt.close()
@@ -123,8 +122,6 @@ def plot_raw(datasize):
 def analyze(datasize):
     """Analyze the raw benchmark data"""
     print 'Analyzing size,' + str(datasize)
-    timer_res = read_timer(datasize)[2] # 3rd line
-    print 'Timer resolution,' + str(timer_res)
     print 'Data store,Test,minimum,average,maximum,bogus,real'
     for datastore in DATASTORES:
         if datastore_benchmarked(datasize, datastore):

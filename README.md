@@ -121,16 +121,9 @@ varied.
 
 Run the benchmark the following way:
 
-1. Set `NUMBER_OF_OBJECTS` in `app/src/main/java/io.realm.datastorebenchmark.Constants.java`.
-   The rest of this guide assumes `1000`, which is also the default value.
+1. Run the following command
 
-2. Deploy the app to the phone or emulator. It will auto-start and report *Done*
-   in the UI when complete. Don't touch the phone while it is running.
-
-       > ./gradlew installDebug
-       
-       > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
-
+       > ./gradlew clean benchmarkReport
 
 ## How to analyse - TLDR
 
@@ -140,13 +133,13 @@ The benchmark results from the supported datastores are analyzed the following w
 
        > cd tools
 
-2. Copy all results from the phone/emulator using ADB to folder named after
-   `NUMBER_OF_OBJECTS`:
+2. Copy all results from the phone/emulator using ADB
 
-       > adb pull /sdcard/datastorebenchmark/ ./1000
+       > adb pull /sdcard/Download/io.realm.benchmark.test-benchmarkData.json
 
-3. Run python script:
+3. Run the following python scripts
 
+       > python convert.py
        > python dsb.py -b -p -s
 
 4. Benchmark plots can be found in `./1000/benchmark_<TEST>.png` The plots are
