@@ -147,7 +147,7 @@ The benchmark results from the supported datastores are analyzed the following w
 
 3. Run python script:
 
-       > python dsb.py -b
+       > python dsb.py -b -p -s
 
 4. Benchmark plots can be found in `./1000/benchmark_<TEST>.png` The plots are
    [box-and-whisker plots](https://en.wikipedia.org/wiki/Box_plot) with an

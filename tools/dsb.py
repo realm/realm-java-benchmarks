@@ -27,20 +27,14 @@ import matplotlib.pyplot as plt
 XKCD_STYLE = False
 
 # List of names of possible tested data stores (see DataStoreTest#getTag())
-DATASTORES = ['sqlite', 'realm', 'ormlite', 'greendao', 'realmlowlevel', 'couchbase']
-
+# DATASTORES = ['sqlite', 'realm', 'room', 'couchbase']
+DATASTORES = ['sqlite', 'realm', 'room']
 # Number of objects tested. It is assumed that all sub folders contain test data and are named after
 # the number of objects tested, e.g "./1000" or "./10000".
-DATASIZES = []
+DATASIZES = ['1000']
 
 # The individual benchmarks (see TestDataStore.java)
-TESTS = ['BatchWrite', 'SimpleWrite', 'SimpleQuery', 'FullScan', 'Sum', 'Count', 'Delete']
-
-def read_timer(datasize):
-    """read the timer resolution"""
-    in_file_name = str(datasize) + '/timer'
-    values = [int(line.strip()) for line in open(in_file_name)]
-    return values
+TESTS = ['batchWrite', 'simpleWrite', 'simpleQuery', 'fullScan', 'sum', 'count', 'delete']
 
 def read_raw_values(datasize, datastore, test):
     """read the raw data for a given test"""
@@ -111,7 +105,6 @@ def plot_histogram(datasize):
 
 def plot_raw(datasize):
     """Plot the raw benchmark data"""
-    timer_res = read_timer(datasize)[2] # 3rd line
     for test in TESTS:
         for datastore in DATASTORES:
             if datastore_benchmarked(datasize, datastore):
@@ -124,7 +117,6 @@ def plot_raw(datasize):
                 values = read_raw_values(datasize, datastore, test)
                 if len(values) > 0:
                     plt.plot(values)
-                    plt.axhline(timer_res, color='red')
                     plt.savefig(str(datasize) + '/raw_' + datastore + '_' + test + '.png')
                 plt.close()
 
