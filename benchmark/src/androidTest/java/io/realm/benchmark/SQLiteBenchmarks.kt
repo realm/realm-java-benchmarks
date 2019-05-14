@@ -18,6 +18,7 @@ package io.realm.benchmark
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.database.sqlite.SQLiteStatement
 import androidx.benchmark.measureRepeated
 import androidx.test.platform.app.InstrumentationRegistry
 
@@ -59,7 +60,7 @@ class SQLiteBenchmarks(size: Long): Benchmarks(size) {
     }
 
     private fun addRows() {
-        val stmt = db.compileStatement("INSERT INTO " + dbHelper.TABLE_SIMPLE + " VALUES(?1, ?2, ?3, ?4)")
+        val stmt: SQLiteStatement = db.compileStatement("INSERT INTO " + dbHelper.TABLE_SIMPLE + " VALUES(?1, ?2, ?3, ?4)")
         db.beginTransaction()
         for (i in 0 until size) {
             stmt.clearBindings()
@@ -166,7 +167,8 @@ class SQLiteBenchmarks(size: Long): Benchmarks(size) {
         benchmarkRule.measureRepeated {
             val cursor = db.rawQuery(String.format("SELECT COUNT(*) AS count FROM %s", dbHelper.TABLE_SIMPLE), null)
             cursor.moveToFirst()
-            @Suppress("UNUSED_VARIABLE") val count = cursor.getInt(0)
+            @Suppress("UNUSED_VARIABLE")
+            val count = cursor.getInt(0)
             cursor.close()
         }
     }

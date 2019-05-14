@@ -28,7 +28,7 @@ interface EmployeeDao {
     @Insert
     fun bulkWrite(list: List<Employee>)
 
-    @Query("SELECT * FROM Employee")
+    @Query("SELECT * FROM Employee WHERE hired = 0 AND age BETWEEN 20 AND 50 AND name = 'Foo0'")
     fun simpleQuery(): List<Employee>
 
     @Query("SELECT * FROM Employee WHERE hired = 1 AND age BETWEEN -2 AND -1 AND name == 'Smile1'")
