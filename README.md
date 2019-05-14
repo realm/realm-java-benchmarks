@@ -32,7 +32,6 @@ even more so.
 
 Here are some of the common problems that have to be taken into consideration:
 
-
 ## System Induced Variance
 
 ### Garbage Collection
@@ -107,11 +106,6 @@ is, you don't have to embed read operations and queries in transactions. Of
 course, when inserting, updating or removing rows or objects from either
 SQLite or Realm, explicit write transactions are used. The implicit read
 transactions are not directly measured.
-
-The `io.realm.internal` is also included in the benchmark under the name Realm
-Low Level. This benchmark is used internally by Realm to measure the overhead
-of the object store. As `io.realm.internal` is using explicit read
-transactions, in some cases `io.realm.internal` will appear slower.
 
 
 ## How to Run
@@ -202,9 +196,9 @@ http://www.purplemath.com/modules/boxwhisk.htm.
 
 The benchmark results were created using the setup described here: [TEST_SETUP](results/TEST_SETUP).
 
-![Batch Write](results/benchmark_BatchWrite.png)
-![Simple Write](results/benchmark_SimpleWrite.png)
-![Simple Query](results/benchmark_SimpleQuery.png)
-![Full Scan - No Results](results/benchmark_FullScan.png)
-![Count](results/benchmark_Count.png)
-![Delete](results/benchmark_Delete.png)
+![Batch Write](results/benchmark_batchWrite.png)
+![Simple Write](results/benchmark_simpleWrite.png)
+![Simple Query](results/benchmark_simpleQuery.png)
+![Full Scan - No Results](results/benchmark_fullScan.png)
+![Count](results/benchmark_count.png)
+![Delete](results/benchmark_delete.png)
