@@ -27,20 +27,13 @@ import matplotlib.pyplot as plt
 XKCD_STYLE = False
 
 # List of names of possible tested data stores (see DataStoreTest#getTag())
-DATASTORES = ['sqlite', 'realm', 'ormlite', 'greendao', 'realmlowlevel', 'couchbase']
-
+DATASTORES = ['sqlite', 'realm', 'room']
 # Number of objects tested. It is assumed that all sub folders contain test data and are named after
 # the number of objects tested, e.g "./1000" or "./10000".
-DATASIZES = []
+DATASIZES = ['10', '100', '1000']
 
 # The individual benchmarks (see TestDataStore.java)
-TESTS = ['BatchWrite', 'SimpleWrite', 'SimpleQuery', 'FullScan', 'Sum', 'Count', 'Delete']
-
-def read_timer(datasize):
-    """read the timer resolution"""
-    in_file_name = str(datasize) + '/timer'
-    values = [int(line.strip()) for line in open(in_file_name)]
-    return values
+TESTS = ['batchWrite', 'simpleWrite', 'simpleQuery', 'fullScan', 'sum', 'count', 'delete']
 
 def read_raw_values(datasize, datastore, test):
     """read the raw data for a given test"""
@@ -83,7 +76,7 @@ def benchmark(datasize):
         plt.ylabel('Ops/sec')
         plt.boxplot(data, whis=1.5, sym='')
         plt.xticks(np.arange(1, len(labels) + 1), labels)
-
+        plt.ylim(ymin=0)
         out_file_name = str(datasize) + '/benchmark_' + test +'.png'
         plt.savefig(out_file_name)
         plt.close()
@@ -111,7 +104,6 @@ def plot_histogram(datasize):
 
 def plot_raw(datasize):
     """Plot the raw benchmark data"""
-    timer_res = read_timer(datasize)[2] # 3rd line
     for test in TESTS:
         for datastore in DATASTORES:
             if datastore_benchmarked(datasize, datastore):
@@ -124,15 +116,12 @@ def plot_raw(datasize):
                 values = read_raw_values(datasize, datastore, test)
                 if len(values) > 0:
                     plt.plot(values)
-                    plt.axhline(timer_res, color='red')
                     plt.savefig(str(datasize) + '/raw_' + datastore + '_' + test + '.png')
                 plt.close()
 
 def analyze(datasize):
     """Analyze the raw benchmark data"""
     print 'Analyzing size,' + str(datasize)
-    timer_res = read_timer(datasize)[2] # 3rd line
-    print 'Timer resolution,' + str(timer_res)
     print 'Data store,Test,minimum,average,maximum,bogus,real'
     for datastore in DATASTORES:
         if datastore_benchmarked(datasize, datastore):

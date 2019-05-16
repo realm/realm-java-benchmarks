@@ -32,7 +32,6 @@ even more so.
 
 Here are some of the common problems that have to be taken into consideration:
 
-
 ## System Induced Variance
 
 ### Garbage Collection
@@ -108,11 +107,6 @@ course, when inserting, updating or removing rows or objects from either
 SQLite or Realm, explicit write transactions are used. The implicit read
 transactions are not directly measured.
 
-The `io.realm.internal` is also included in the benchmark under the name Realm
-Low Level. This benchmark is used internally by Realm to measure the overhead
-of the object store. As `io.realm.internal` is using explicit read
-transactions, in some cases `io.realm.internal` will appear slower.
-
 
 ## How to Run
 
@@ -121,16 +115,9 @@ varied.
 
 Run the benchmark the following way:
 
-1. Set `NUMBER_OF_OBJECTS` in `app/src/main/java/io.realm.datastorebenchmark.Constants.java`.
-   The rest of this guide assumes `1000`, which is also the default value.
+1. Run the following command
 
-2. Deploy the app to the phone or emulator. It will auto-start and report *Done*
-   in the UI when complete. Don't touch the phone while it is running.
-
-       > ./gradlew installDebug
-       
-       > adb shell am start -a android.intent.action.MAIN -n io.realm.datastorebenchmark/io.realm.datastorebenchmark.MainActivity
-
+       > ./gradlew clean benchmarkReport
 
 ## How to analyse - TLDR
 
@@ -140,14 +127,14 @@ The benchmark results from the supported datastores are analyzed the following w
 
        > cd tools
 
-2. Copy all results from the phone/emulator using ADB to folder named after
-   `NUMBER_OF_OBJECTS`:
+2. Copy all results from the phone/emulator using ADB
 
-       > adb pull /sdcard/datastorebenchmark/ ./1000
+       > adb pull /sdcard/Download/io.realm.benchmark.test-benchmarkData.json
 
-3. Run python script:
+3. Run the following python scripts
 
-       > python dsb.py -b
+       > python convert.py
+       > python dsb.py -b -p -s
 
 4. Benchmark plots can be found in `./1000/benchmark_<TEST>.png` The plots are
    [box-and-whisker plots](https://en.wikipedia.org/wiki/Box_plot) with an
@@ -209,9 +196,9 @@ http://www.purplemath.com/modules/boxwhisk.htm.
 
 The benchmark results were created using the setup described here: [TEST_SETUP](results/TEST_SETUP).
 
-![Batch Write](results/benchmark_BatchWrite.png)
-![Simple Write](results/benchmark_SimpleWrite.png)
-![Simple Query](results/benchmark_SimpleQuery.png)
-![Full Scan - No Results](results/benchmark_FullScan.png)
-![Count](results/benchmark_Count.png)
-![Delete](results/benchmark_Delete.png)
+![Batch Write](results/benchmark_batchWrite.png)
+![Simple Write](results/benchmark_simpleWrite.png)
+![Simple Query](results/benchmark_simpleQuery.png)
+![Full Scan - No Results](results/benchmark_fullScan.png)
+![Count](results/benchmark_count.png)
+![Delete](results/benchmark_delete.png)
